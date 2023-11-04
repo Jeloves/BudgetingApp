@@ -4,9 +4,6 @@ import { Budget } from "../model/budget.js";
 
 export class Controller {
     #user = null;
-    constructor() {
-        new UnitTest();
-    }
 
     getUser() {
         return this.#user;

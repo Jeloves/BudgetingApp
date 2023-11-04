@@ -22,7 +22,6 @@ function startActivity() {
     const categoryName2 = 'Essential';
 
 
-    console.log(controller);
 }
 
 if (typeof document !== 'undefined') {  
