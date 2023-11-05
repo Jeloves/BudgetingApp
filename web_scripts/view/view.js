@@ -21,7 +21,8 @@ function startActivity() {
     const categoryName1 = 'Nonessential';
     const categoryName2 = 'Essential';
 
-
+    controller.createCategory(categoryName1);
+    controller.createCategory(categoryName2);
 }
 
 if (typeof document !== 'undefined') {  
