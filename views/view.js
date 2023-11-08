@@ -1,4 +1,4 @@
-import { Controller } from "../controller/controller.js";
+import { Controller } from "../controllers/controller.js";
 
 function uuid(prefix) {     // prefix is the class name as a lowercase string; 'user','budget','category', etc.
     return prefix + '_' + window.crypto.randomUUID();

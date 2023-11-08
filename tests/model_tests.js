@@ -1,5 +1,5 @@
-import { User } from "../web_scripts/model/user.js";
-import { Budget } from "../web_scripts/model/budget.js";
+import { User } from "../models/user.js";
+import { Budget } from "../models/budget.js";
 
 export class ModelTest {
 

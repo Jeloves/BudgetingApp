@@ -1,6 +1,6 @@
-import { UnitTest } from "../../tests/unit_test.js";
-import { User } from "../model/user.js";
-import { Budget } from "../model/budget.js";
+import { UnitTest } from "../tests/unit_test.js";
+import { User } from "../models/user.js";
+import { Budget } from "../models/budget.js";
 
 export class Controller {
     #user = null;
