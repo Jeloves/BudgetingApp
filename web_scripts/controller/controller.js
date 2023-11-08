@@ -22,7 +22,7 @@ export class Controller {
 
     createCategory(name) {
         const newCategory = new Category(name);
-
+        
     }
 
 }

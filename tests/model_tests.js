@@ -6,7 +6,6 @@ export class ModelTest {
     constructor() {
         this.#testUserConstructor();
         this.#testUserCreateBudget();
-
         this.#testBudgetConstructor();
     }
 

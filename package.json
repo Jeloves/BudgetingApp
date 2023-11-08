@@ -11,6 +11,5 @@
   "dependencies": {
     "crypto": "^1.0.1"
   },
-  "type": "module",
-  "devDependencies": {}
+  "type": "module"
 }
