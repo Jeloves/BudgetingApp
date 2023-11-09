@@ -1,16 +1,12 @@
+const User = require('./models/classes.js');
+
+
+
 const { v4: uuidv4 } = require('uuid')
 var mysql = require('mysql2');
 const express = require('express');
 const app = express();
 const port = 3000;
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -19,8 +15,9 @@ var connection = mysql.createConnection({
     database: "user_data"
 });
 
+
 // A new user is created.
-const User = require('./models/classes.js');
+/*
 const newUserID = 'user_' + uuidv4()
 const jelo = new User(newUserID, 'User01', 'password1234', 'email@gmail.com', '2023-11-09')
 function addNewUserToDatabase(user) {
@@ -39,5 +36,22 @@ function addNewUserToDatabase(user) {
         });
     });
 }
-// addNewUserToDatabase(jelo)
+addNewUserToDatabase(jelo)
+*/
 
+// The existing user is signed in.
+let signedInUser = null;
+
+function signInUser(username,password) {
+    connection.connect(function (err) {
+        if (err) throw err;
+        var sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
+        connection.query(sql, function (err, result) {
+            if (err) throw err;
+            signInUser = new User('user_id_'+uuidv4(),username,'user_password_'+uuidv4(),result[0].email,result[0].date);
+            console.log(signInUser);
+        });
+    });
+}
+
+signInUser('User01','password1234');
