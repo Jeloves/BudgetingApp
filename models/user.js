@@ -39,34 +39,34 @@ class User {
     }
 }
 
-/*
 export class UserModel {
     #currentUser;
-
-    setCurrentUser(username, email, date) {
-        currentUser = new User('user_id_' + uuidv4(), username, 'user_password_' + uuidv4(), email, date);
-        console.log(currentUser);
-    }
-    validateUserCredentials(username, password) {
-        connection.connect(function (err) {
-            if (err) throw err;
-            var sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
-            connection.query(sql, function (err, result) {
-                if (err) throw err;
-                this.setCurrentUser(result[0].username,result[0].email,result[0].date);
+    #validateCredentials(username, password) {
+        return new Promise((resolve, reject) => {
+            const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
+            return connection.query(sql, (error, result) => {
+                if (error) {
+                    return reject(false);
+                } else if (result.length === 1) {
+                    return resolve(result[0]);
+                } else {
+                    return reject(true);
+                }
             });
-        });
+        })
+    }
+    async loginUser(username, password) {
+        const data = await this.#validateCredentials(username, password);
+        if (data === true) {
+            return 'ERROR: Multiple users with these credentials were found in database.';
+        } else if (data === false) {
+            return 'ERROR: Failed to connect to database.';
+        } else if (data !== null) {
+            this.#currentUser = new User('userID_' + data.id, data.username, 'userPassword_' + data.password, data.email, data.date);
+            return null;
+        }
+    }
+    getCurrentUser() {
+        return this.#currentUser;
     }
 }
-*/
-
-const app = express();
-
-app.use((req,res) => {
-    console.log('New request sent.');
-    res.send('<h1>New request, wow!</h1>');
-})
-
-app.listen(443, 'jelo.github.io', ()=> {
-    console.log("Listening on Port8080");
-})
