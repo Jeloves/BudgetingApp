@@ -1,49 +1,60 @@
-export class User {
-    #id;
-    #email;
-    #password;
-    #name;
-    #dateCreated;
-    #budgets = [];
-    constructor(id, email, password, name, dateCreated) {
-        this.#id = id;
-        this.#email = email;
-        this.#password = password;
-        this.#name = name;
-        this.#dateCreated = dateCreated;
-    }
+import { v4 as uuidv4 } from 'uuid'
+import * as mysql from 'mysql2'
+let connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "gengiW-temmy2-wahnap",
+    database: "user_data"
+});
 
+class User {
+    #id;
+    #name;
+    #password;
+    #email;
+    #date;
+    constructor(id, name, password, email, date) {
+        this.#id = id;
+        this.#name = name;
+        this.#password = password;
+        this.#email = email;
+        this.#date = date;
+    }
     getUserID() {
         return this.#id;
     }
-    getEmail() {
-        return this.#email;
+    getName() {
+        return this.#name;
     }
     getPassword() {
         return this.#password;
     }
-    getUsername() {
-        return this.#name;
+    getEmail() {
+        return this.#email;
     }
-    getDateCreated() {
-        return this.#dateCreated;
+    getDate() {
+        return this.#date;
     }
-    getBudgetSize() {
-        return this.#budgets.length;
-    }
+}
 
-    createBudget(newBudget) {
-        this.#budgets.push(newBudget);
-        this.#budgets.sort((b1, b2) => {
-            if (b1.dateCreated < b2.dateCreated) {
-                return -1;
-            }
-            if (b1.dateCreated > b2.dateCreated) {
-                return 1;
-            }
-            return 0;
+export class UserModel {
+    #currentUser;
+
+    setCurrentUser(username, email, date) {
+        currentUser = new User('user_id_' + uuidv4(), username, 'user_password_' + uuidv4(), email, date);
+        console.log(currentUser);
+    }
+    validateUserCredentials(username, password) {
+        connection.connect(function (err) {
+            if (err) throw err;
+            var sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
+            connection.query(sql, function (err, result) {
+                if (err) throw err;
+                this.setCurrentUser(result[0].username,result[0].email,result[0].date);
+            });
         });
     }
-
-
 }
+
+const model = new UserModel();
+model.validateUserCredentials('User01','password1234')
