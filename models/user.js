@@ -1,5 +1,7 @@
-import { v4 as uuidv4 } from 'uuid'
-import * as mysql from 'mysql2'
+import { v4 as uuidv4 } from 'uuid';
+import * as mysql from 'mysql2';
+import express from 'express';
+
 let connection = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -37,6 +39,7 @@ class User {
     }
 }
 
+/*
 export class UserModel {
     #currentUser;
 
@@ -55,6 +58,15 @@ export class UserModel {
         });
     }
 }
+*/
 
-const model = new UserModel();
-model.validateUserCredentials('User01','password1234')
+const app = express();
+
+app.use((req,res) => {
+    console.log('New request sent.');
+    res.send('<h1>New request, wow!</h1>');
+})
+
+app.listen(443, 'jelo.github.io', ()=> {
+    console.log("Listening on Port8080");
+})

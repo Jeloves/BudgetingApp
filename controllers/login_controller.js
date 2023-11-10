@@ -1,6 +1,6 @@
 import { UserModel } from "../models/user.js";
 
-class LoginController {
+export class LoginController {
     #userModel = new UserModel();
 
     signInUser(username,password) {
