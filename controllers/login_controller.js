@@ -1,5 +1,5 @@
-import express from 'express';
 import { UserModel } from '../models/user.js';
+import express from 'express';
 
 export class LoginController {
     #userModel = new UserModel();
@@ -14,18 +14,6 @@ export class LoginController {
     }
 }
 
-let con = new LoginController();
-con.loginUser('User01','password1234')
-
-/*
-const app = express();
-app.get('/ ', (req, res) => {
-    console.log('here');
-    res.
-});
-
-app.listen(3000, () => {
-    console.log('Server is listening.')
-});
-
-*/
+function initLoginController() {
+    return new LoginController();
+}

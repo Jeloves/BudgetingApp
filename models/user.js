@@ -1,13 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
 import * as mysql from 'mysql2';
-import express from 'express';
 
-let connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "gengiW-temmy2-wahnap",
-    database: "user_data"
-});
 
 class User {
     #id;
@@ -40,11 +32,17 @@ class User {
 }
 
 export class UserModel {
+    #connection = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "gengiW-temmy2-wahnap",
+        database: "user_data"
+    });
     #currentUser;
     #validateCredentials(username, password) {
         return new Promise((resolve, reject) => {
             const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
-            return connection.query(sql, (error, result) => {
+            return this.#connection.query(sql, (error, result) => {
                 if (error) {
                     return reject(false);
                 } else if (result.length === 1) {

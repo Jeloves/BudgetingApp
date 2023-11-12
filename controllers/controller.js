@@ -1,28 +1,15 @@
-import { UnitTest } from "../tests/unit_test.js";
-import { User } from "../models/user.js";
-import { Budget } from "../models/budget.js";
+import { UserModel } from '../models/user.js';
 
-export class Controller {
-    #user = null;
-    #selectedBudget = null;
-    getUser() {
-        return this.#user;
+export class LoginController {
+    #userModel = new UserModel();
+
+    async loginUser(username, password) {
+        const error = await this.#userModel.loginUser(username, password);
+        if (error !== null) {
+            console.e(data.error)
+        } else {
+            console.log(`User Login Successful: ${this.#userModel.getCurrentUser().getName()}`);
+        }
     }
-
-
-    createUser(userID,email,password,userName,budgetID,budgetName,dateCreated) {
-        this.#user = new User(userID,email,password,userName,dateCreated);
-        const newBudget = new Budget(budgetID,budgetName,dateCreated);
-        this.#user.createBudget(newBudget);
-        this.#selectedBudget = newBudget;
-    }
-    signInUser(user) {
-        this.#user = user;
-    }
-
-    createCategory(name) {
-        const newCategory = new Category(name);
-        
-    }
-
 }
+
