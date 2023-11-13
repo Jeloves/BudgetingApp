@@ -9,12 +9,12 @@
 </head>
 
 <body>
-    <form id="form_user_login">
+    <form method="post" action="/login" id="form_user_login">
         <label>Username</label>
-        <input type="text" name="username" id="input_user_name">
+        <input type="text" name="username" id="input_user_name" required>
         <label>Password</label>
-        <input type="text" name="password" id="input_user_password">
-        <button type="sumbit" id="btn_login_user">Submit</button>
+        <input type="password" name="password" id="input_user_password" required>
+        <button type="submit" id="btn_login_user">Login</button>
     </form>
 
     <p id="p_validation_results"></p>

@@ -14,6 +14,13 @@ export class LoginController {
     }
 }
 
-function initLoginController() {
-    return new LoginController();
+const model = new UserModel();
+export async function validateUserCredentials(username, password) {
+    const error = await model.loginUser(username, password);
+    if (error !== null) {
+        console.e(data.error)
+    } else {
+        console.log(`User Login Successful: ${model.getCurrentUser().getName()}`);
+        return model.getCurrentUser();
+    }
 }
