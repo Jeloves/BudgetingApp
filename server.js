@@ -14,15 +14,21 @@ app.use(express.static('scripts'));
 app.get('/login', (request,result) => {
     result.render('login');
     console.log('Login view rendered.');
-})
+});
 
 app.use(express.urlencoded({extended: true}))
 app.post('/login', (request, result) => {
     let username = request.body.username;
     let password = request.body.password;
     console.log('Attempting login...');
-    loginUser(username,password);
-    result.send(username)
+    loginUser(username,password).then(()=>{
+        result.redirect('/');
+    });
+});
+
+app.get('/', (request,result) => {
+    result.render('index');
+    console.log('Index view rendered.');
 });
 
 app.listen(3000, () => {

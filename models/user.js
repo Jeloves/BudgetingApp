@@ -32,6 +32,10 @@ class User {
 
 let currentUser = null;
 
+export function getCurrentUser() {
+    return currentUser;
+}
+
 export async function loginUser(username, password) {
     const error = validateCredentials(username, password);
     error.then(()=>{

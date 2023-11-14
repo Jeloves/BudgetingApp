@@ -1,4 +1,4 @@
-export class Budget {
+class Budget {
     #id;
     #name;
     #dateCreated;
