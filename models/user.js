@@ -1,6 +1,7 @@
 import * as mysql from 'mysql2';
 import { v4 as uuidv4 } from 'uuid';
 import { Budget } from './budget.js';
+import { setSessionCookie } from '../scripts/login_script.js';
 
 class User {
     #id;
@@ -58,10 +59,14 @@ export async function loginUser(username, password) {
             default:
                 console.log('User signed in.')
                 currentUser = new User('userID_' + uuidv4(), user.username, 'userPassword_' + uuidv4(), user.email, user.date);
-                const currentBudgetID = getLastUsedBudgetID(user.id)
-                currentBudgetID.then((budgetID) => {
-                    currentBudget = getBudgetByID(budgetID);
-                    console.log(`Current Budget: ${currentBudget}`);
+                const sessionPromise = createSession(user.id);
+                sessionPromise.then(() => {
+                    
+                    // How do we send the sessionID to the client via cookie?
+
+
+
+                    
                 })
         }
     }, () => { console.log('Promise rejected logging into user.') });
@@ -80,129 +85,40 @@ function validateCredentials(username, password) {
             }
         });
     });
-
 }
 
-function getLastUsedBudgetID(userID) {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM user_budget WHERE userID = '${userID}' AND budgetLastUsed = '1'`
+async function createSession(userID) {
+    const sessionID = 'sesh_' + uuidv4();
+    const sessionCreatePromise = new Promise((resolve, reject) => {
+        const sql = `INSERT INTO session (id, idle) VALUES ('${sessionID}', 1)`;
         return connection.query(sql, (error, result) => {
             if (error) {
-                return reject(error);
-            } else if (result.length > 1) {
-                return reject('ERROR: Multiple last used budgets found.')
-            } else if (result.length === 0) {
-                const newBudgetPromise = createNewBudget(userID);
-                newBudgetPromise.then((budget) => {
-                    const updateTablePromise = updateUserBudgetTable(userID,budget.id);
-                    updateTablePromise.then(() => {
-                        return resolve(budget.id);
-                    })
-                });
-            } else if (result.length === 1) {
-                return resolve(result[0].budgetID);
+                console.error(error);
+                return reject();
             } else {
-                return reject('ERROR: Unknown error @ getLastUsedBudget()');
-            }
-        })
-    })
-}
-function getBudgetByID(budgetID) {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM budget WHERE id = '${budgetID}'`
-        return connection.query(sql, (error, result) => {
-            if (error) {
-                return reject(error);
-            } else if (result.length > 1) {
-                return reject('ERROR: Multiple last used budgets found.')
-            } else if (result.length === 0) {
-                return reject('ERROR: No budgets found even after calling createNewBudget().')
-            } else if (result.length === 1) {
-                return resolve(result[0]);
-            } else {
-                return reject('ERROR: Unknown error @ getBudgetByID()');
-            }
-        })
-    })
-}
-
-function createNewBudget() {
-    return new Promise((resolve, reject) => {
-        const budgetID = uuidv4()
-        const sql = `INSERT INTO budget (id,name,date) VALUES ('${budgetID}','My New Budget','${new Date()}')`;
-        return connection.query(sql, (error, result) => {
-            if (error) {
-                return reject(error);
-            } else {
-                currentBudget = new Budget(`budgetID_${uuidv4()}`,result.name,result.date);
-                return resolve(result);
+                return resolve(sessionID);
             }
         });
     });
+    sessionCreatePromise.then((sessionID) => {
+        const sessionStartPromise = startSession(sessionID, userID);
+        sessionStartPromise.then(()=> {
+            // TODO -
+        });
+    });
 }
-function updateUserBudgetTable(userID,budgetID) {
+function startSession(sessionID, userID) {
     return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO user_budget (userID,budgetID,budgetLastUsed) VALUES ('${userID}','${budgetID}','1')`;
+        const sql = `INSERT INTO session_user (sessionID, userID) VALUES ('${sessionID}', '${userID}')`;
         return connection.query(sql, (error, result) => {
             if (error) {
-                return reject(error);
+                console.error(error);
+                return reject()
             } else {
-                return resolve();
+                return resolve()
             }
         });
     });
 }
 
-/*
-function checkLastUsedBudget(userID) {
-    return new Promise((resolve,reject) => {
-        const sql = `SELECT * FROM user_budget WHERE userID = '${userID}' AND budgetLastUsed = '${true}'`;
-        return connection.query(sql, (error,result) => {
-            if (error) {
-                return reject(false);
-            } else if (result.length > 0) {
-                return reject(true);
-            } else if (result.length === 1) {
-                return resolve(result[0]);
-            } else if (result.length === 0) {
-                console.log('A new budget must be created...')
-                const budgetPromise = createNewBudget(userID,'New Budget',new Date());
-                budgetPromise.then((newBudget) => {
-                    resolve(newBudget[0])
-                })
-            }
-            else {
-                return reject(null);
-            }
-        })
-    })
-}
 
-
-function createNewBudget(userID,name,date) {
-    console.log('Creating new budget...')
-    const budgetID = uuidv4()
-    const budgetPromise = new Promise((resolve,reject) => {
-        const sql = `INSERT INTO budget(id,name,date) VALUES ('${userID}','${name}','${date}')`;
-        return connection.query(sql, (error,result) => {
-            if (error) {
-                return reject(false);
-            } else {
-                console.log(`Result of createNewBudget Promise: ${result}`)
-                return resolve(result[0]);
-            }
-        })
-    });
-    budgetPromise.then(()=>{
-        const sql = `INSERT INTO user_budget(userID,budgetID,budgetLastUsed) VALUES ('${userID}','${budgetID}',1)`;
-        connection.query(sql, (error,result) => {
-            if (error) {
-                console.log(error)
-            } else {
-                console.log('Budget successfully created.');
-            }
-        })
-        return budgetPromise;
-    });
-}
-*/
