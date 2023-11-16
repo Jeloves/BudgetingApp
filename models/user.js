@@ -2,28 +2,20 @@ import * as mysql from 'mysql2';
 import { v4 as uuidv4 } from 'uuid';
 import { Budget } from './budget.js';
 import { setSessionCookie } from '../scripts/login_script.js';
+import { credentialValidationError } from '../errors.js'
+import { uuid } from 'uuidv4';
 
 class User {
-    #id;
     #name;
-    #password;
     #email;
     #date;
-    constructor(id, name, password, email, date) {
-        this.#id = id;
+    constructor(name, email, date) {
         this.#name = name;
-        this.#password = password;
         this.#email = email;
         this.#date = date;
     }
-    getUserID() {
-        return this.#id;
-    }
     getName() {
         return this.#name;
-    }
-    getPassword() {
-        return this.#password;
     }
     getEmail() {
         return this.#email;
@@ -46,79 +38,100 @@ export function getCurrentUser() {
     return currentUser;
 }
 
-export async function loginUser(username, password) {
-    const validation = validateCredentials(username, password);
-    validation.then((user) => {
-        switch (user) {
-            case true:
-                console.error('ERROR: Multiple users with these credentials were found in database.');
-            case false:
-                console.error('ERROR: Failed to connect to database.');
-            case null:
-                console.error('ERROR: Credentials were valid, but no user found.');
-            default:
-                console.log('User signed in.')
-                currentUser = new User('userID_' + uuidv4(), user.username, 'userPassword_' + uuidv4(), user.email, user.date);
-                const sessionPromise = createSession(user.id);
-                sessionPromise.then(() => {
-                    
-                    // How do we send the sessionID to the client via cookie?
-
-
-
-                    
-                })
-        }
-    }, () => { console.log('Promise rejected logging into user.') });
-}
-
-function validateCredentials(username, password) {
-    return new Promise((resolve, reject) => {
+export async function validateUserCredentials(username, password) {
+    const validationPromise = new Promise((resolve, reject) => {
         const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
         return connection.query(sql, (error, result) => {
+            // Error cases for validating user credentials with database information.
             if (error) {
-                return reject(false);
+                return reject(error);
             } else if (result.length === 1) {
                 return resolve(result[0]);
             } else {
-                return reject(true);
+                return reject(credentialValidationError);
             }
         });
     });
+    return validationPromise.then(
+        (result) => {
+            console.log('User credentials validated.')
+            return loginUser(result.id, result.name, result.email, result.date);
+        },
+        (error) => {
+            console.error(`User credentials invalid: ${error}`);
+            return new Promise((resolve, reject) => {
+                reject();
+            });
+        });
 }
 
-async function createSession(userID) {
-    const sessionID = 'sesh_' + uuidv4();
-    const sessionCreatePromise = new Promise((resolve, reject) => {
+async function loginUser(userID, username, email, date) {
+    return new Promise((resolve, reject) => {
+        const sessionCreated = createUserSession();
+        return sessionCreated.then(
+            (sessionID) => {
+                return startUserSession(sessionID, userID).then(
+                    () => {
+                        currentUser = new User(username, email, date);
+                        return resolve(sessionID);
+                    },
+                    () => {
+                        return reject()
+                    });
+            },
+            () => {
+                return reject()
+            });
+    });
+}
+
+
+async function createUserSession() {
+    const sessionID = uuidv4();
+    return new Promise((resolve, reject) => {
         const sql = `INSERT INTO session (id, idle) VALUES ('${sessionID}', 1)`;
-        return connection.query(sql, (error, result) => {
+        return connection.query(sql, (error) => {
             if (error) {
-                console.error(error);
-                return reject();
+                console.error(`User session could not be created: ${error}`);
+                return reject(error);
             } else {
+                console.log('User session created.');
                 return resolve(sessionID);
             }
         });
     });
-    sessionCreatePromise.then((sessionID) => {
-        const sessionStartPromise = startSession(sessionID, userID);
-        sessionStartPromise.then(()=> {
-            // TODO -
-        });
-    });
 }
-function startSession(sessionID, userID) {
+async function startUserSession(sessionID, userID) {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO session_user (sessionID, userID) VALUES ('${sessionID}', '${userID}')`;
-        return connection.query(sql, (error, result) => {
+        return connection.query(sql, (error) => {
             if (error) {
-                console.error(error);
-                return reject()
+                console.error(`User session failed to start: ${error}`);
+                return reject(error);
             } else {
-                return resolve()
+                console.log('User session started.');
+                return resolve();
             }
         });
     });
 }
+async function endUserSession(sessionID) {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM session_user WHERE sessionID = '${sessionID}'`;
+        return connection.query(sql, (error) => {
+            if (error) {
+                console.error(`User session failed to end: ${error}`);
+                return reject(error);
+            } else {
+                console.log('User session ended.');
+                return resolve();
+            }
+        });
+    })
+}
+
+
+
+
 
 
