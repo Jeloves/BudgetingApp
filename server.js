@@ -3,6 +3,7 @@ import * as mysql from 'mysql2';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loginRouter } from './routes/login.js';
+import { budgetRouter } from './routes/budget.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -14,6 +15,7 @@ app.set('views', path.join(__dirname, '/views'));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/scripts')));
 app.use('/login', loginRouter);
+app.use('/budget', budgetRouter);
 
 export const connection = mysql.createConnection({
     host: "localhost",
@@ -35,7 +37,6 @@ app.listen(3000, () => {
     console.log('Server is listening.');
 }); 
 
-app.post
 
 
 

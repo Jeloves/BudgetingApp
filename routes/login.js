@@ -1,18 +1,12 @@
 import express from 'express';
-import path from 'path';
 import { validateUserCredentials } from '../models/user.js'
-import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
-import {getLastUsedBudgetID} from '../models/budget.js'; 
+import { SessionTimer } from '../models/session.js';
 
 export const loginRouter = express.Router();
 
-const __subdirname = path.dirname(fileURLToPath(import.meta.url));
-const __dirname = path.dirname(__subdirname);
-
 loginRouter.use(cookieParser());
 loginRouter.get('/', (request, result) => {
-    result.sendFile('/login_script.js');
     result.render('login');
     console.log('Login view rendered.');
 });
@@ -25,12 +19,9 @@ loginRouter.post('/', (request, result) => {
     const validationPromise = validateUserCredentials(username, password);
     validationPromise.then(
         function resolved(sessionID) {
-            console.log('User log in successful.')
-            setUserSessionCookie(result, sessionID, 1);
-            getLastUsedBudgetID()
-            
-            console.log(`This is the endpoint: `)
-            result.redirect('./');
+            console.log('User log in successful.');
+            setSessionCookie(result, sessionID, 5);
+            result.redirect('./budget');
         },
         function rejected() {
             console.error('User log in failed.')
@@ -38,7 +29,7 @@ loginRouter.post('/', (request, result) => {
         });
 });
 
-function setUserSessionCookie(result, sessionID, minutesToElapse) {
+function setSessionCookie(result, sessionID, minutesToElapse) {
     const currentDate = new Date();
     const expiration = new Date(currentDate.getTime() + minutesToElapse * 60000);
     result.cookie(`sessionID`, sessionID, {
@@ -48,3 +39,4 @@ function setUserSessionCookie(result, sessionID, minutesToElapse) {
         sameSite: 'lax'
     });
 }
+

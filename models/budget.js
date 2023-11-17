@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { connection } from '../server.js';
 import { sessionValidationError, lastUsedBudgetError } from '../errors.js';
 
@@ -18,14 +19,14 @@ export class Budget {
 
 
 async function getUserID(sessionID) {
-    return promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM session_user WHERE sessionID = '${sessionID}'`;
         return connection.query(sql, (error, result) => {
             // Error cases for validating user session with database information.
             if (error) {
                 return reject(error);
             } else if (result.length === 1) {
-                return resolve(result[0].id);
+                return resolve(result[0].id);x
             } else {
                 return reject(sessionValidationError);
             }
