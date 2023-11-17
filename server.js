@@ -1,4 +1,5 @@
 import express from 'express';
+import * as mysql from 'mysql2';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loginRouter } from './routes/login.js';
@@ -14,9 +15,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/scripts')));
 app.use('/login', loginRouter);
 
+export const connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "gengiW-temmy2-wahnap",
+    database: "user_data"
+});
+
 app.get('/', (request,result) => {
     result.render('index');
     console.log(getSessionID(request));
+
+
+
     console.log('Index view rendered.');
 });
 
@@ -24,7 +35,14 @@ app.listen(3000, () => {
     console.log('Server is listening.');
 }); 
 
+app.post
+
+
+
+
 function getSessionID(request) {
     return request.cookies.sessionID;
 }
+
+
 

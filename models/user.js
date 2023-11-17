@@ -1,41 +1,21 @@
-import * as mysql from 'mysql2';
 import { v4 as uuidv4 } from 'uuid';
-import { Budget } from './budget.js';
-import { setSessionCookie } from '../scripts/login_script.js';
-import { credentialValidationError } from '../errors.js'
-import { uuid } from 'uuidv4';
+import { credentialValidationError } from '../errors.js'    
+import { connection } from '../server.js';
 
-class User {
-    #name;
-    #email;
-    #date;
-    constructor(name, email, date) {
-        this.#name = name;
-        this.#email = email;
-        this.#date = date;
-    }
-    getName() {
-        return this.#name;
-    }
-    getEmail() {
-        return this.#email;
-    }
-    getDate() {
-        return this.#date;
-    }
-}
-
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "gengiW-temmy2-wahnap",
-    database: "user_data"
-});
-
-let currentUser = null;
-let currentBudget = null;
-export function getCurrentUser() {
-    return currentUser;
+export async function createNewUser(username, password, email) {
+    return new Promise((resolve, reject) => {
+        const userID = uuidv4();
+        const userDate = new Date().toISOString().slice(0,19).replace('T', ' ');
+        const sql = `INSERT INTO user (id,username,password,email,date) VALUES ('${userID}','${username}','${password}','${email}','${userDate}')`;
+        return connection.query(sql, (error, result) => {
+            // Error cases for validating user credentials with database information.
+            if (error) {
+                return reject(error);
+            } else {
+                return resolve(result[0]);
+            } 
+        });
+    });
 }
 
 export async function validateUserCredentials(username, password) {
@@ -64,7 +44,6 @@ export async function validateUserCredentials(username, password) {
             });
         });
 }
-
 async function loginUser(userID, username, email, date) {
     return new Promise((resolve, reject) => {
         const sessionCreated = createUserSession();
@@ -72,7 +51,6 @@ async function loginUser(userID, username, email, date) {
             (sessionID) => {
                 return startUserSession(sessionID, userID).then(
                     () => {
-                        currentUser = new User(username, email, date);
                         return resolve(sessionID);
                     },
                     () => {
@@ -85,11 +63,10 @@ async function loginUser(userID, username, email, date) {
     });
 }
 
-
 async function createUserSession() {
     const sessionID = uuidv4();
     return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO session (id, idle) VALUES ('${sessionID}', 1)`;
+        const sql = `INSERT INTO session (id, idle) VALUES ('${sessionID}', 0)`;
         return connection.query(sql, (error) => {
             if (error) {
                 console.error(`User session could not be created: ${error}`);
@@ -129,7 +106,6 @@ async function endUserSession(sessionID) {
         });
     })
 }
-
 
 
 

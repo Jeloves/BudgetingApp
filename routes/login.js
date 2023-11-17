@@ -3,7 +3,7 @@ import path from 'path';
 import { validateUserCredentials } from '../models/user.js'
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
-import { setSessionCookie } from '../scripts/login_script.js';
+import {getLastUsedBudgetID} from '../models/budget.js'; 
 
 export const loginRouter = express.Router();
 
@@ -24,12 +24,15 @@ loginRouter.post('/', (request, result) => {
     console.log('Attempting login...');
     const validationPromise = validateUserCredentials(username, password);
     validationPromise.then(
-        (sessionID) => {
+        function resolved(sessionID) {
             console.log('User log in successful.')
             setUserSessionCookie(result, sessionID, 1);
+            getLastUsedBudgetID()
+            
+            console.log(`This is the endpoint: `)
             result.redirect('./');
         },
-        () => {
+        function rejected() {
             console.error('User log in failed.')
             result.render('login');
         });
