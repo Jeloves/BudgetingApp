@@ -1,7 +1,8 @@
 import express from 'express';
-import { validateUserCredentials } from '../models/user.js'
+import { validateUserCredentials } from '../models/login.js'
 import cookieParser from 'cookie-parser';
-import { SessionTimer } from '../models/session.js';
+
+
 
 export const loginRouter = express.Router();
 
@@ -16,15 +17,14 @@ loginRouter.post('/', (request, result) => {
     let username = request.body.username;
     let password = request.body.password;
     console.log('Attempting login...');
-    const validationPromise = validateUserCredentials(username, password);
-    validationPromise.then(
-        function resolved(sessionID) {
-            console.log('User log in successful.');
-            setSessionCookie(result, sessionID, 5);
+    validateUserCredentials(username, password).then(
+        function resolved(userID) {
+            console.log('User validation successful.');
+            startSession(userID);
             result.redirect('./budget');
         },
-        function rejected() {
-            console.error('User log in failed.')
+        function rejected(error) {
+            console.error(`User validation failed: ${error}`)
             result.render('login');
         });
 });

@@ -19,31 +19,25 @@ export async function createNewUser(username, password, email) {
 }
 
 export async function validateUserCredentials(username, password) {
-    const validationPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
         return connection.query(sql, (error, result) => {
             // Error cases for validating user credentials with database information.
             if (error) {
                 return reject(error);
             } else if (result.length === 1) {
-                return resolve(result[0]);
+                return resolve(result[0].id);
             } else {
                 return reject(credentialValidationError);
             }
         });
     });
-    return validationPromise.then(
-        (result) => {
-            console.log('User credentials validated.')
-            return loginUser(result.id, result.name, result.email, result.date);
-        },
-        (error) => {
-            console.error(`User credentials invalid: ${error}`);
-            return new Promise((resolve, reject) => {
-                reject();
-            });
-        });
 }
+
+
+
+
+
 async function loginUser(userID, username, email, date) {
     return new Promise((resolve, reject) => {
         const sessionCreated = createUserSession();
@@ -51,7 +45,7 @@ async function loginUser(userID, username, email, date) {
             (sessionID) => {
                 return startUserSession(sessionID, userID).then(
                     () => {
-                        return resolve(sessionID);
+                        return resolve(sessionID, userID);
                     },
                     () => {
                         return reject()
