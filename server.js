@@ -40,7 +40,7 @@ const storeOptions = {
 const MySQLStore = MySQLStoreCreator(session);
 const sessionStore = new MySQLStore(storeOptions, connection);
 sessionStore.onReady().then(() => {
-	console.log('MySQLStore initialized.');
+	console.log('MySQLStore initialized');
 }).catch(error => {
 	console.error(`MySQLStore failed to initialize: ${error}`);
 });
@@ -61,5 +61,5 @@ app.use(session({
 app.use('/login', loginRouter);
 app.use('/budget', budgetRouter);
 app.listen(port, () => {
-    console.log(`Server is listening on port ${port}.`);
+    console.log(`Server is listening on port ${port}`);
 });
