@@ -4,38 +4,43 @@ import { } from '../errors.js';
 let currentBudgetName = null;
 let currentBudgetDate = null;
 
-export function getBudgetData(connection, userID) {
-    getBudgetID(connection, userID).then(
-        function resolved(budgetID) {
-            getBudgetNameDate(connection, budgetID).then(
-                function resolved(budget) {
+export function getLastUsedBudget(connection, userID) {
+    getLastUsedBudgetID(connection, userID).then(
+        (budgetID) => {
+            getBudgetData(connection, budgetID).then(
+                (budget) => {
                     currentBudgetName = budget.name;
                     currentBudgetDate = budget.date;
-                },
-                function rejected(error) {
-                    console.error(`Failed to retrieve budget data: ${error}`);
+                    getAccountIDs(connection, budgetID).then(
+                        (accountIDs) => {
+                            for (let id of accountIDs) {
+                                getAccountData(connection, id).then((account) => {
+                                    console.log(`Account Name: ${account.name}`)
+                                });
+                            }
+                        }
+                    )
                 }
             )
-        },
-        function rejected(error) {
-            console.error(`Failed to retrieve budget id: ${error}`);
         }
     );
 }
 
-function getBudgetID(connection, userID) {
+function getLastUsedBudgetID(connection, userID) {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM budget_user WHERE userID = '${userID}'`;
+        const sql = `SELECT * FROM budget_user WHERE userID = '${userID}' AND lastUsed = '1'`;
         return connection.query(sql, (error, result) => {
             if (error) {
+                console.error(`Failed to retrieve last used budget id: ${error}`);
                 return reject(error);
             } else {
+                console.log(`Retrieved last used budget id.`);
                 return resolve(result[0].budgetID);
             }
         });
     });
 }
-function getBudgetNameDate(connection, budgetID) {
+function getBudgetData(connection, budgetID) {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM budget WHERE id = '${budgetID}'`;
         return connection.query(sql, (error, result) => {
@@ -43,10 +48,43 @@ function getBudgetNameDate(connection, budgetID) {
                 console.error(`Failed to retrieve budget data: ${error}`);
                 return reject(error);
             } else {
-                console.log(`Budget data retrieved successfully.`);
+                console.log(`Budget data retrieved.`);
                 return resolve(result[0]);
             }
         });
     });
 }
 
+function getAccountIDs(connection, budgetID) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM account_budget WHERE budgetID = '${budgetID}'`;
+        return connection.query(sql, (error, result) => {
+            if (error) {
+                console.error(`Failed to retrieve account ids: ${error}`);
+                return reject()
+            } else {
+                const accountIDs = [];
+                for (let i in result) {
+                    accountIDs.push(result[i].accountID);
+                }
+                console.log(`Account ids retrieved.`);
+                return resolve(accountIDs);
+            }
+        });
+    });
+}
+function getAccountData(connection, accountID) {
+    console.log(`Account ID; ${accountID}`)
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM account WHERE id = '${accountID}'`;
+        return connection.query(sql, (error, result) => {
+            if (error) {
+                console.error(`Failed to retrieve account data: ${error}`);
+                return reject();
+            } else {
+                console.log(`Account data retrieved.`);
+                return resolve(result[0]);
+            }
+        });
+    });
+}
