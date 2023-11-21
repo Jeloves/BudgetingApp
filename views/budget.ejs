@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Budget</title>
-    <script type="module" src="budget.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Budget</title>
+  <script type="module" src="budget.js"></script>
 </head>
+
 <body>
-    <div id="div_budget_view">
-        <form method="post" action="/"><button type="submit" id="btn_submit">SUBMIT!!!</button></form>
+  <main>
+    <% let categories=budget.getCategories() %>
+    <% for (let ci in categories) {%>
+    <div class="category_wrapper" id="category_wrapper_<%=ci%>">
+      <div class="category_view" id="category_view_<%=ci%>"><%=categories[ci].getName()%></div>
+      <% let subcategories=categories[ci].getSubcategories() %>
+      <% for (let si in subcategories) {%>
+      <div class="subcategory_wrapper" id="subcategory_wrapper_ci<%=si%>_si<%=si%>">
+        <div class="subcategory_view" id="subcategory_view_ci<%=ci%>_si<%=si%>"><%=subcategories[si].getName()%></div>
+        <div class="allocation_view" id="allocation_view_ci<%=ci%>_si<%=si%>"><%=subcategories[si].getAvailableBalance()%></div>
+      </div>
+      <% }%>
     </div>
+    <% }%>
+  </main>
 </body>
+
 </html>

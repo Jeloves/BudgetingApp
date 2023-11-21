@@ -5,13 +5,36 @@ class Budget {
     #date;
     #accounts = [];
     #categories = [];
-    constructor(name, date, accounts, categories) {
+    constructor(name, date) {
         this.#name = name;
         this.#date = date;
     }
-    initializeData(accounts, categories) {
+    initializeData(accounts, categories, year, month) {
         this.#accounts = accounts;
         this.#categories = categories;
+        // Setting allocation to display based on year and month.
+        for (let category of this.#categories) {
+            for (let subcategory of category.getSubcategories()) {
+                for (let allocation of subcategory.getAllocations()) {
+                    if (allocation.getYear() === year || allocation.getMonth() === month) {
+                        subcategory.setAvailableBalance(allocation.getAmount());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    getName() {
+        return this.#name;
+    }
+    getDate() {
+        return this.#date;
+    }
+    getAccounts() {
+        return this.#accounts;
+    }
+    getCategories() {
+        return this.#categories;
     }
 }
 
@@ -34,11 +57,18 @@ class Category {
         this.#subcategories.push(subcategory);
         // TODO SORT
     }
+    getName() {
+        return this.#name;
+    }
+    getSubcategories() {
+        return this.#subcategories;
+    }
 }
 
 class Subcategory {
     #name;
     #allocations = [];
+    #availableBalance = 0.00;
     constructor(name) {
         this.#name = name;
     }
@@ -46,18 +76,41 @@ class Subcategory {
         this.#allocations.push(allocation);
         // TODO SORT
     }
-}
-
-class Allocation {
-    #date;
-    #amount;
-    constructor(date, amount) {
-        this.#date = date;
-        this.#amount = amount;
+    getName() {
+        return this.#name; 
+    }
+    getAllocations() {
+        return this.#allocations;
+    }
+    setAvailableBalance(balance) {
+        this.#availableBalance = balance;
+    }
+    getAvailableBalance() {
+        return this.#availableBalance;
     }
 }
 
-export async function getBudgetData(connection, userID) {
+class Allocation {
+    #year;
+    #month;
+    #amount;
+    constructor(year, month, amount) {
+        this.#year = year;
+        this.#month = month;
+        this.#amount = amount;
+    }
+    getYear() {
+        return this.#year;
+    }
+    getMonth() {
+        return this.#month;
+    }
+    getAmount() {
+        return this.#amount;
+    }
+}
+
+export async function getBudgetData(connection, userID, year, month) {
     try {
         // Retrieving last used budget ID
         const budgetID = await getLastUsedBudgetID(connection, userID);
@@ -87,7 +140,7 @@ export async function getBudgetData(connection, userID) {
             categoryObjects.push(categoryObject);
         }
         // Creating the budget view model
-        budgetObject.initializeData(accountObjects, categoryObjects);
+        budgetObject.initializeData(accountObjects, categoryObjects, year, month);
         return new Promise((resolve) => {
             resolve(budgetObject);
         })
@@ -108,7 +161,6 @@ function getLastUsedBudgetID(connection, userID) {
                 console.error(`Failed to retrieve last used budget id: ${error}`);
                 return reject(error);
             } else {
-                console.log(`Retrieved last used budget id.`);
                 return resolve(result[0].budgetID);
             }
         });
@@ -122,7 +174,6 @@ function getLastUsedBudget(connection, budgetID) {
                 console.error(`Failed to retrieve budget data: ${error}`);
                 return reject(error);
             } else {
-                console.log(`Budget data retrieved.`);
                 return resolve(new Budget(result[0].name, result[0].date));
             }
         });
@@ -141,7 +192,6 @@ function getAccountIDs(connection, budgetID) {
                 for (let i in result) {
                     accountIDs.push(result[i].accountID);
                 }
-                console.log(`Account ids retrieved.`);
                 return resolve(accountIDs);
             }
         });
@@ -155,7 +205,6 @@ function getAccount(connection, accountID) {
                 console.error(`Failed to retrieve account data: ${error}`);
                 return reject();
             } else {
-                console.log(`Account data retrieved.`);
                 resolve(new Account(result[0].name,result[0].balance));
             }
         });
@@ -174,7 +223,6 @@ function getCategoryIDs(connection, budgetID) {
                 for (let i in result) {
                     categoryIDs.push(result[i].categoryID);
                 }
-                console.log(`Category ids retrieved.`);
                 return resolve(categoryIDs);
             }
         });
@@ -188,7 +236,6 @@ function getCategory(connection, categoryID) {
                 console.error(`Failed to retrieve category data: ${error}`);
                 return reject();
             } else {
-                console.log(`Category data retrieved.`);
                 return resolve(new Category(result[0].name));
             }
         });
@@ -207,7 +254,6 @@ function getSubcategoryIDs(connection, categoryID) {
                 for (let i in result) {
                     subcategoryIDs.push(result[i].subcategoryID);
                 }
-                console.log(`Subcategory ids retrieved.`);
                 return resolve(subcategoryIDs);
             }
         });
@@ -221,7 +267,6 @@ function getSubcategory(connection, subcategoryID) {
                 console.error(`Failed to retrieve subcategory data: ${error}`);
                 return reject();
             } else {
-                console.log(`Subcategory data retrieved.`);
                 return resolve(new Subcategory(result[0].name));
             }
         });
@@ -240,7 +285,6 @@ function getAllocationIDs(connection, subcategoryID) {
                 for (let i in result) {
                     allocationIDs.push(result[i].allocationID);
                 }
-                console.log(`Allocation ids retrieved.`);
                 return resolve(allocationIDs);
             }
         });
@@ -254,8 +298,7 @@ function getAllocation(connection, allocationID) {
                 console.error(`Failed to retrieve allocation data: ${error}`);
                 return reject();
             } else {
-                console.log(`Allocation data retrieved.`);
-                return resolve(new Allocation(result[0].date, result[0].amount));
+                return resolve(new Allocation(result[0].year, result[0].month, result[0].amount));
             }
         });
     });

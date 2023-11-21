@@ -5,23 +5,23 @@ import { getBudgetData } from '../models/budget.js';
 
 export const budgetRouter = express.Router();
 
+budgetRouter.use(express.static('../scripts'));
 budgetRouter.get('/', (request, result) => {
     validateSessionID(connection, request.session.id).then(
-        (userID) => {handleResolvedSessionID(result, userID)},
-        handleRejectedSessionID()
+        (userID) => {
+            const year = new Date().getFullYear();
+            const month = new Date().getMonth() + 1;
+            getBudgetData(connection, userID, year, month).then((budgetObject) => {
+                result.render('budget', { budget: budgetObject })
+            });
+        },
+        () => { handleRejectedSessionID() }
     );
 });
 
-budgetRouter.post('/', (request, result) => {
 
-});
-
-function handleResolvedSessionID(result, userID) {
-    getBudgetData(connection, userID).then((budgetObject) => {
-        result.sendFile()
-        result.render('budget')
-    });
-}
 function handleRejectedSessionID() {
     console.error('Oh god what do we do....')
 }
+
+
