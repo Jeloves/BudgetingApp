@@ -1,13 +1,20 @@
 import { } from '../errors.js';
+import Intl from 'intl';
 
 class Budget {
     #name;
     #date;
     #accounts = [];
     #categories = [];
-    constructor(name, date) {
+    #locale;
+    #currency;
+    #currencyFormatter;
+    constructor(name, date, locale, currency) {
         this.#name = name;
         this.#date = date;
+        this.#locale = locale;
+        this.#currency = currency
+        this.#currencyFormatter = new Intl.NumberFormat(this.#locale, {style:'currency', currency:this.#currency, maximumFractionDigits:2});
     }
     initializeData(accounts, categories, year, month) {
         this.#accounts = accounts;
@@ -36,13 +43,34 @@ class Budget {
     getCategories() {
         return this.#categories;
     }
-    getAccountBalance() {
-        let sum = 0.00;
-        for (let account of this.#accounts) {
-            console.log(account.getBalance());
-            sum += account.getBalance();
+    getTotalAccountBalance() {
+        let sumCurrency = this.#currencyFormatter.format(0.00);
+        if(this.#accounts.length > 0) {
+            for (let account of this.#accounts) {
+                sumCurrency = this.#currencyFormatter.format(this.parseCurrencyToFloat(sumCurrency) + account.getBalance());
+            }
+        } 
+        return sumCurrency
+    }
+    parseCurrencyToFloat(currencyString) {
+        let floatString = ''
+        for (let char of currencyString) {
+            switch (this.#currency) {
+                case 'USD': {
+                    if (char !== '$' && char !== ',') {
+                        floatString += char;
+                    }
+                    break;
+                }
+            }
         }
-        return sum
+        return parseFloat(floatString);
+    }
+    parseFloatToCurrency(float) {
+        return this.#currencyFormatter.format(float);
+    }
+    getCurrencyFormatter() {
+        return this.#currencyFormatter;
     }
 }
 
@@ -51,7 +79,7 @@ class Account {
     #balance;
     constructor(name, balance) {
         this.#name = name;
-        this.#balance = balance;
+        this.#balance = parseFloat(balance);
     }
     getName() {
         return this.#name;
@@ -82,7 +110,9 @@ class Category {
 class Subcategory {
     #name;
     #allocations = [];
-    #availableBalance = 0.00;
+    #assignedBalance;
+    #activityBalance;
+    #availableBalance;
     constructor(name) {
         this.#name = name;
     }
@@ -101,6 +131,12 @@ class Subcategory {
     }
     getAvailableBalance() {
         return this.#availableBalance;
+    }
+    getActivityBalance() {
+
+    }
+    getAssignedBalance() {
+
     }
 }
 
@@ -188,7 +224,7 @@ function getLastUsedBudget(connection, budgetID) {
                 console.error(`Failed to retrieve budget data: ${error}`);
                 return reject(error);
             } else {
-                return resolve(new Budget(result[0].name, result[0].date));
+                return resolve(new Budget(result[0].name, result[0].date, result[0].locale, result[0].currency));
             }
         });
     });

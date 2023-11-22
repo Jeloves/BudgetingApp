@@ -11,7 +11,7 @@ budgetRouter.get('/', (request, result) => {
             const year = new Date().getFullYear();
             const month = new Date().getMonth() + 1;
             getBudgetData(connection, userID, year, month).then((budgetObject) => {
-                result.render('budget', { budget: budgetObject })
+                result.render('budget', { budget: budgetObject})
             });
         },
         () => { handleRejectedSessionID() }

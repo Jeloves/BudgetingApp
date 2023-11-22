@@ -12,39 +12,72 @@
 <body>
   <nav>
     <ol>
-      <li class="li_navigation"><a class="navigation_link" id="navigation_link_budget">Budget</a></li>
-      <li class="li_navigation"><a class="navigation_link" id="navigation_link_accounts">Accounts</a></li>
-      <li class="li_navigation">
-        <ol class="account_summary" id="navigation_account_summary">
+      <li class="navigation"><%=budget.getName()%></li>
+      <li class="navigation"><a class="navigation_link" id="navigation_link_budget">Budget</a></li>
+      <li class="navigation"><a class="navigation_link" id="navigation_link_accounts">Accounts</a></li>
+      <li class="navigation">
+        <div class="account_summary_wrapper">
+          <% const accountSize=budget.getAccounts().length %>
           <% const accounts=budget.getAccounts() %>
-          <% for (let i in accounts) { %>
-            <li class="li_account_summary">  
-              <div class="account_summary_view" id="account_summary_name_view_<%=i+1%>"><%=accounts[i].getName()%></div>
-              <div class="account_summary_view" id="account_summary_balance_view_<%=i+1%>"><%=accounts[i].getBalance()%></div>
-            </li>
+          <% for (let i=0; i<accountSize; i++) { %>
+          <div class="account_summary_view_wrapper" id="account_summary_view_wrapper_<%=i+1%>">
+            <div class="account_summary_name_view" id="account_summary_name_view_<%=i+1%>"><%=accounts[i].getName()%></div>
+            <div class="account_summary_balance_view" id="account_summary_balance_view_<%=i+1%>"><%=budget.parseFloatToCurrency(accounts[i].getBalance())%></div>
+          </div>
           <% } %>
-          <li class="'li_account_summary">
-            <div class="account_summary_view" id="account_summary_name_view_0">Budget</div>
-            <div class="account_summary_view" id="account_summary_balance_view_0"><%=budget.getAccountBalance()%></div>
-          </li>
-        </ol>
-      </li>  
+          <div class="account_summary_view_wrapper" id="account_summary_view_wrapper_0">
+            <div class="account_summary_name_view" id="account_summary_name_view_0">Budget</div>
+            <div class="account_summary_balance_view" id="account_summary_balance_view_0"><%=budget.getTotalAccountBalance()%></div>
+          </div>
+        </div>
+      </li>
     </ol>
   </nav>
   <main>
-    <% let categories=budget.getCategories() %>
-    <% for (let ci in categories) {%>
-    <div class="category_wrapper" id="category_wrapper_<%=ci%>">
-      <div class="category_view" id="category_view_<%=ci%>"><%=categories[ci].getName()%></div>
-      <% let subcategories=categories[ci].getSubcategories() %>
-      <% for (let si in subcategories) {%>
-      <div class="subcategory_wrapper" id="subcategory_wrapper_ci<%=si%>_si<%=si%>">
-        <div class="subcategory_view" id="subcategory_view_ci<%=ci%>_si<%=si%>"><%=subcategories[si].getName()%></div>
-        <div class="allocation_view" id="allocation_view_ci<%=ci%>_si<%=si%>"><%=subcategories[si].getAvailableBalance()%></div>
-      </div>
-      <% }%>
+    <!--Header View-->
+    <header>
+
+    </header>
+
+    <div class="section_wrapper">
+      <section class="categories">
+        <div class="inner_category_wrapper" id="header_wrapper">
+          <data class="header_name">CATEGORY</data>
+          <data class="allocation_header">ASSIGNED</data>
+          <data class="allocation_header">ACTIVITY</data>
+          <data class="allocation_header">AVAILABLE</data>
+        </div>
+        <% let categories=budget.getCategories() %>
+        <% for (let ci in categories) {%>
+        <div class="outer_category_wrapper" id="outer_category_wrapper_<%=ci%>">
+          <div class="inner_category_wrapper" id="inner_category_wrapper_<%=ci%>">
+            <data class="category_name" id="category_name_ci<%=ci%>"><%=categories[ci].getName()%></data>
+            <data class="allocation_view" id="assigned_allocation_ci<%=ci%>">0.00</data>
+            <data class="allocation_view" id="activity_allocation_ci<%=ci%>">0.00</data>
+            <data class="allocation_view" id="available_allocation_ci<%=ci%>">0.00</data>
+          </div>
+          <% let subcategories=categories[ci].getSubcategories() %>
+          <% for (let si in subcategories) {%>
+          <div class="inner_category_wrapper" id="inner_category_wrapper_ci<%=si%>_si<%=si%>">
+            <data class="subcategory_name" id="subcategory_name_ci<%=ci%>_si<%=si%>"><%=`${parseInt(si) + 1}. ${subcategories[si].getName()}`%></data>
+            <data class="allocation_view" id="assigned_allocation_ci<%=ci%>_si<%=si%>"><%=budget.parseFloatToCurrency(subcategories[si].getAssignedBalance())%></data>
+            <data class="allocation_view" id="activity_allocation_ci<%=ci%>_si<%=si%>"><%=budget.parseFloatToCurrency(subcategories[si].getActivityBalance())%></data>
+            <data class="allocation_view" id="available_allocation_ci<%=ci%>_si<%=si%>"><%=budget.parseFloatToCurrency(subcategories[si].getAvailableBalance())%></data>
+          </div>
+          <% }%>
+        </div>
+        <% }%>
+      </section>
+      <section class="transactions">
+
+      </section>
     </div>
-    <% }%>
+
+
+    <div class="transaction_wrapper" id>
+
+    </div>
+
   </main>
 </body>
 
