@@ -5,10 +5,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Budget</title>
-  <script type="module" src="budget.js"></script>
+  <link rel="stylesheet" href="/reset.css">
+  <link rel="stylesheet" href="/budget.css">
 </head>
 
 <body>
+  <nav>
+    <ol>
+      <li class="li_navigation"><a class="navigation_link" id="navigation_link_budget">Budget</a></li>
+      <li class="li_navigation"><a class="navigation_link" id="navigation_link_accounts">Accounts</a></li>
+      <li class="li_navigation">
+        <ol class="account_summary" id="navigation_account_summary">
+          <% const accounts=budget.getAccounts() %>
+          <% for (let i in accounts) { %>
+            <li class="li_account_summary">  
+              <div class="account_summary_view" id="account_summary_name_view_<%=i+1%>"><%=accounts[i].getName()%></div>
+              <div class="account_summary_view" id="account_summary_balance_view_<%=i+1%>"><%=accounts[i].getBalance()%></div>
+            </li>
+          <% } %>
+          <li class="'li_account_summary">
+            <div class="account_summary_view" id="account_summary_name_view_0">Budget</div>
+            <div class="account_summary_view" id="account_summary_balance_view_0"><%=budget.getAccountBalance()%></div>
+          </li>
+        </ol>
+      </li>  
+    </ol>
+  </nav>
   <main>
     <% let categories=budget.getCategories() %>
     <% for (let ci in categories) {%>

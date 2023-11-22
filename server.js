@@ -51,6 +51,7 @@ const __dirname = path.dirname(__filename);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(express.static(path.join(__dirname, '/scripts')));
+app.use(express.static(path.join(__dirname, '/content')));
 app.use(session({
     secret: uuidv4(),
     saveUninitialized: true,
@@ -58,7 +59,7 @@ app.use(session({
     cookie: { maxAge: expiration * 60000 },
     resave: false
 }));
-app.use('/login', loginRouter);
+app.use('/', loginRouter);
 app.use('/budget', budgetRouter);
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);

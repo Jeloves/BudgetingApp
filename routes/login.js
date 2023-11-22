@@ -5,7 +5,6 @@ import { connection } from '../server.js';
 export const loginRouter = express.Router();
 
 loginRouter.get('/', (request, result) => {
-    console.log('Login view rendered');
     result.render('login');
 });
 

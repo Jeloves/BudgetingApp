@@ -1,0 +1,14 @@
+body {
+    display: flex;
+
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.subcategory_wrapper {
+    display: flex;
+}
+

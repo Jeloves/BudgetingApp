@@ -5,7 +5,6 @@ import { getBudgetData } from '../models/budget.js';
 
 export const budgetRouter = express.Router();
 
-budgetRouter.use(express.static('../scripts'));
 budgetRouter.get('/', (request, result) => {
     validateSessionID(connection, request.session.id).then(
         (userID) => {

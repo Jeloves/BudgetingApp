@@ -36,6 +36,14 @@ class Budget {
     getCategories() {
         return this.#categories;
     }
+    getAccountBalance() {
+        let sum = 0.00;
+        for (let account of this.#accounts) {
+            console.log(account.getBalance());
+            sum += account.getBalance();
+        }
+        return sum
+    }
 }
 
 class Account {
@@ -44,6 +52,12 @@ class Account {
     constructor(name, balance) {
         this.#name = name;
         this.#balance = balance;
+    }
+    getName() {
+        return this.#name;
+    }
+    getBalance() {
+        return this.#balance;
     }
 }
 
