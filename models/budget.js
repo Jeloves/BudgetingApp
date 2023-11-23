@@ -4,6 +4,9 @@ import Intl from 'intl';
 class Budget {
     #name;
     #date;
+    #selectedDate;
+    #selectedYear;
+    #selectedMonth;
     #accounts = [];
     #categories = [];
     #locale;
@@ -17,6 +20,16 @@ class Budget {
         this.#currencyFormatter = new Intl.NumberFormat(this.#locale, {style:'currency', currency:this.#currency, maximumFractionDigits:2});
     }
     initializeData(accounts, categories, year, month) {
+        switch (this.#currency) {
+            case 'USD': {
+                this.#selectedYear = year;
+                this.#selectedMonth = month;
+                const date = new Date(year, month-1);
+                const dateString = date.toLocaleString(this.#locale , { month: 'short' }) + ` ${year}`;
+                this.#selectedDate = dateString;
+                break;
+            }
+        }
         this.#accounts = accounts;
         this.#categories = categories;
         // Setting allocation to display based on year and month.
@@ -36,6 +49,9 @@ class Budget {
     }
     getDate() {
         return this.#date;
+    }
+    getSelectedDate() {
+        return this.#selectedDate;
     }
     getAccounts() {
         return this.#accounts;
@@ -71,6 +87,20 @@ class Budget {
     }
     getCurrencyFormatter() {
         return this.#currencyFormatter;
+    }
+    getUnassignedBalance() {
+        const accountBalance = this.parseCurrencyToFloat(this.getTotalAccountBalance());
+        let assignedBalance = 0.00;
+        for (let category of this.#categories) {
+            for (let subcategory of category.getSubcategories()) {
+                for (let allocation of subcategory.getAllocations()) {
+                    if (allocation.getYear() === this.#selectedYear && allocation.getMonth() === this.#selectedMonth) {
+                        assignedBalance += parseFloat(allocation.getAmount())
+                    }
+                }
+            }
+        }
+        return this.#currencyFormatter.format(accountBalance - assignedBalance);
     }
 }
 

@@ -36,7 +36,15 @@
   <main>
     <!--Header View-->
     <header>
-
+        <div class="date_wrapper" >
+          <button class="button_date_select" id="button_previous_date"><%='<'%></button>
+          <button class="button_date_label"><%=budget.getSelectedDate()%></button>
+          <button class="button_date_select" id="button_next_date"><%='>'%></button>
+        </div>
+        <div class="unassigned_wrapper">
+          <data class="unassigned_value"><%=budget.getUnassignedBalance()%></data>
+          <label class="unassigned_label">Ready to Assign</label>
+        </div>
     </header>
 
     <div class="section_wrapper">
@@ -72,7 +80,6 @@
 
       </section>
     </div>
-
 
     <div class="transaction_wrapper" id>
 
