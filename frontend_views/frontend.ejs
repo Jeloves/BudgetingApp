@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend</title>
+  <link rel="stylesheet" href="/reset.css">
+  <link rel="stylesheet" href="/frontend.css">
+</head>
+
+<body>
+  <main>
+    <header>
+      <section class="top_bar">
+        <button class="top_bar" id="navigation_selector">
+          <i class="selector_icon" id="navigation_selector_icon" style="background:url('./icons/nav_icon.png'); background-size:contain; background-repeat: no-repeat;"></i>
+        </button>
+        <div class="flex_empty_space"></div>
+        <button class="top_bar" id="date_selector">
+          <data id="selected_date">Nov 2023&nbsp;</data>
+          <i class="selector_icon" id="date_selector_icon" style="background:url('./icons/bordered_drop_arrow.png'); background-size:contain; background-repeat: no-repeat;"></i>
+        </button>
+        <div class="flex_empty_space"></div>
+        <button class="top_bar" id="category_selector">
+          <i class="selector_icon" id="category_selector_icon" style="background:url('./icons/edit_icon.png'); background-size:contain; background-repeat: no-repeat;"></i>
+        </button>
+      </section>
+      <section class="unassigned_balance">
+        <div class="unassigned_balance_wrapper">
+          <data class="unassigned_value">$ 0.00</data>
+          <label class="unassigned_label">Ready to Assign</label>
+        </div>
+      </section>
+    </header>
+
+    <div id="padding_block"></div>
+
+    <section class="categories">
+      <div class="category_wrapper">
+        <i class="collapse_category"></i>
+        <data class="category_name">
+          Essential
+        </data>
+        <div class="category_balance_wrapper">
+          <div class="category_assigned_balance_wrapper">
+            <label class="category_balance">Assigned</label>
+            <data class="category_balance" id="assigned_balance_ci0">$ 0.00</data>
+          </div>
+        </div>
+        <div class="category_balance_wrapper">
+          <label class="category_balance">Available</label>
+          <div class="category_available_balance_wrapper">$ 0.00</div>
+        </div>
+      </div>
+      <div class="subcategory_wrapper">
+        <i class="collapse_subcategory"></i>
+        <data class="subcategory_name" id="subcategory_name_ci0_si0">Food</data>
+        <data class="subcategory_balance" id="assigned_balance_ci0_si0">
+            <div class="subcategory_assigned_balance_wrapper">$ 0.00</div>
+        </data>
+        <data class="subcategory_balance" id="available_balance_ci0_si0">
+          <div class="subcategory_available_balance_wrapper">$ 0.00</div>
+        </data>
+      </div>
+      <div class="subcategory_wrapper">
+        <i class="collapse_subcategory"></i>
+        <data class="subcategory_name" id="subcategory_name_ci0_si1">Gas</data>
+        <data class="subcategory_balance" id="assigned_balance_ci0_si1">
+          <div class="subcategory_assigned_balance_wrapper">$ 0.00</div>
+        </data>
+        <data class="subcategory_balance" id="available_balance_ci0_si1">
+          <div class="subcategory_available_balance_wrapper">$ 0.00</div>
+        </data>
+      </div>
+      <div class="category_wrapper">
+        <i class="collapse_category" id="icon_collapse_category_c1"></i>
+        <data class="category_name">Nonessential</data>
+        <div class="category_balance_wrapper">
+          <label class="category_balance">Assigned</label>
+          <data class="category_balance" id="assigned_balance_ci1">
+            <div class="category_assigned_balance_wrapper">$ 70.00</div>
+          </data>
+        </div>
+        <div class="category_balance_wrapper">
+          <label class="category_balance">Available</label>
+          <data class="category_balance" id="available_balance_ci0">
+            <div class="category_available_balance_wrapper">$ 0.00</div>
+          </data>
+        </div>
+      </div>
+      <div class="subcategory_wrapper">
+        <i class="collapse_subcategory"></i>
+        <data class="subcategory_name" id="subcategory_name_ci1_si0">Crunchyroll</data>
+        <data class="subcategory_balance" id="assigned_balance_ci0_si1">
+          <div class="subcategory_assigned_balance_wrapper">$ 10.50</div>
+        </data>
+        <data class="subcategory_balance" id="available_balance_ci0_si1">
+          <div class="subcategory_available_balance_wrapper">$ 0.00</div>
+        </data>
+      </div>
+      <div class="subcategory_wrapper">
+        <i class="collapse_subcategory"></i>
+        <data class="subcategory_name" id="subcategory_name_ci1_si1">Videogames</data>
+        <data class="subcategory_balance" id="assigned_balance_ci0_si1">
+          <div class="subcategory_assigned_balance_wrapper">$ 75.50</div>
+        </data>
+        <data class="subcategory_balance" id="available_balance_ci0_si1">
+          <div class="subcategory_available_balance_wrapper">$ 75.50</div>
+        </data>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>
