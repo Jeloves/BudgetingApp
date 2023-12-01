@@ -3,21 +3,23 @@ import * as mysql from 'mysql2';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import { loginRouter } from './routes/login.js';
+import { loginRouter } from './routes/auth.js';
 import { budgetRouter } from './routes/budget.js';
 import session from 'express-session';
 import MySQLStoreCreator from 'express-mysql-session';
+import passport from 'passport'
 
 const port = 3000;
 const connectionHost = 'localhost';
 const connectionUser = 'root';
 const connectionPassword = 'gengiW-temmy2-wahnap';
-const connectionDatabase = 'user_data';
+const connectionDatabase = 'new_leaf_data';
 export const connection = mysql.createConnection({
     host: connectionHost,
     user: connectionUser,
     password: connectionPassword,
-    database: connectionDatabase
+    database: connectionDatabase,
+    namedPlaceholders: true
 });
 // How frequently expired sessions will be cleared; minutes:
 const checkExpirationInterval = 6 * 60;
@@ -31,7 +33,7 @@ const storeOptions = {
     schema: {
         tableName: 'session',
         columnNames: {
-            session_id: 'sessionID',
+            session_id: 'session_id',
             expires: 'expires',
             data: 'data',
         }
@@ -59,7 +61,8 @@ app.use(session({
     cookie: { maxAge: expiration * 60000 },
     resave: false
 }));
-app.use('/', loginRouter);
+app.use(passport.authenticate('session'));
+app.use('/login', loginRouter);
 app.use('/budget', budgetRouter);
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
