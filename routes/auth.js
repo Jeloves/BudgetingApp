@@ -9,7 +9,6 @@ import { failedUserVerification } from '../errors.js';
 export const loginRouter = express.Router();
 
 loginRouter.use(express.urlencoded({ extended: true }));
-
 loginRouter.get('/', (request, result) => {
     result.render('auth');
 });
@@ -19,16 +18,17 @@ loginRouter.post('/', passport.authenticate('local', {
     failureRedirect: '/'
 }));
 
-loginRouter.post('/signup', (request, result, next) => {
-    var salt = crypto.randomBytes(16);
+loginRouter.post('/signup', (request, result, callback) => {
+    const salt = crypto.randomBytes(16);
+    const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
     crypto.pbkdf2(request.body.password, salt, 310000, 32, 'sha256', function (error, hashedPassword) {
         if (error) {
-            return next(error);
+            return callback(error);
         } else {
             new Promise((resolve, reject) => {
                 const userID = uuidv4();
-                const sql = `INSERT INTO user (id,name,password,salt,email,date) VALUES (?,?,?,?,?,?)`;
-                return connection.query(sql, [userID, request.body.username, hashedPassword, salt, request.body.email, new Date().toISOString().slice(0, 19).replace('T', ' ')], (error, result) => {
+                const sql = `INSERT INTO user (id,email,password,salt,date) VALUES (?,?,?,?,?)`;
+                return connection.query(sql, [userID, request.body.email, hashedPassword, salt, datetime], (error) => {
                     if (error) {
                         return reject(error);
                     } else {
@@ -38,56 +38,50 @@ loginRouter.post('/signup', (request, result, next) => {
             }).then(
                 (userID) => {
                     request.logIn(userID, (error) => {
-                        if (error) { return next(error) }
-                        result.end();
+                        if (error) { return callback(error) }
+                        result.redirect('../budget');
                     });
                 },
                 (error) => {
-                    return next(error)
+                    return callback(error)
                 }
             );
         }
     });
 });
 
-passport.use(new LocalStrategy(function verify(username, password, callback) {
+passport.use(new LocalStrategy(function verify(email, password, callback) {
     new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM user WHERE name = '${username}'`;
-        return connection.query(sql, (error, result) => {
+        const sql = `SELECT * FROM user WHERE email = ?`;
+        return connection.query(sql, [email], (error, result) => {
             if (error) {
-                return reject(error);
+                return reject(callback(error));
             } else if (result.length === 1) {
                 return resolve(result[0]);
             } else {
-                return reject(failedUserVerification);
+                return reject(callback(null, false, { message: failedUserVerification }));
             }
         });
     }).then(
         (user) => {
-            crypto.pbkdf2(password, Buffer.from(user.salt, "utf-8"), 310000, 32, 'sha256', function (error, hashedPassword) {
+            crypto.pbkdf2(password, Buffer.from(user.salt, 'utf-8'), 310000, 32, 'sha256', function (error, hashedPassword) {
                 if (error) { return callback(error); }
                 if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
                     return callback(null, false, { message: failedUserVerification })
+                } else {
+                    return callback(null, user.id);
                 }
-                return callback(null, user.id);
             });
         },
-        (error) => {
-            if (error === failedUserVerification) {
-                return callback(null, false, { message: failedUserVerification })
-            } else {
-                return callback(error);
-            }
-        }
+        (errorCallback) => { return errorCallback }
     );
 }));
 
 passport.serializeUser(function (userID, callback) {
     process.nextTick(function () {
-        callback(null, {id: userID})
+        callback(null, { id: userID })
     });
 });
-
 passport.deserializeUser(function (user, callback) {
     process.nextTick(function () {
         return callback(null, user);

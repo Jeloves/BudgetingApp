@@ -1,0 +1,43 @@
+body {
+    font-size: 16px;
+}
+
+i {
+    background-image: url(../images/leaf.png);
+ 
+}
+
+#login_form {
+    display: flex;
+    flex-direction: column;
+}
+
+div.login_options {
+    display: flex;
+}
+label.login_options {
+    
+}
+a.login_options {
+    flex-grow: 1;
+    text-align: end;
+}
+
+div.login_divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: gray;
+}
+hr.login_divider {
+    background-color: gray;
+    border-width: 0px;
+    height: 0.05rem;
+    width: max-content;
+    flex-grow: 1;
+}
+
+button.login {
+    background-color: blue;
+    color: white;
+}

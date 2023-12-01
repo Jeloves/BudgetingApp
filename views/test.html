@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../content/reset.css">
+    <link rel="stylesheet" href="../content/login.css">
+    <title>User Login</title>
+</head>
+
+<body>
+    <form method="post" action="/login" id="login_form">
+        <i></i>
+        <input type="text" name="email" required><label class="login_credentials">Email</label></input>
+        <input type="password" name="password"required><label class="login_credentials">Password</label></input>
+        <div class="login_options">
+            <label class="login_options">
+                <input type="checkbox">
+                Keep me logged in
+            </label>
+            <a class="login_options">Forgot password?</a>
+        </div>
+        <button class="login" type="submit">Login</button>
+        <div class="login_divider"><hr class="login_divider">&nbsp;&nbsp;or&nbsp;&nbsp;<hr class="login_divider"></div>
+    </form>
+</body>
+
+</html>
