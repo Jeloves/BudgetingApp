@@ -10,12 +10,12 @@ export const loginRouter = express.Router();
 
 loginRouter.use(express.urlencoded({ extended: true }));
 loginRouter.get('/', (request, result) => {
-    result.render('auth');
+    result.render('login');
 });
 
 loginRouter.post('/', passport.authenticate('local', {
-    successRedirect: './budget',
-    failureRedirect: '/'
+    successRedirect: '/budget',
+    failureRedirect: '/login'
 }));
 
 loginRouter.post('/signup', (request, result, callback) => {
@@ -50,7 +50,11 @@ loginRouter.post('/signup', (request, result, callback) => {
     });
 });
 
-passport.use(new LocalStrategy(function verify(email, password, callback) {
+const localStrategyOptions = {
+    usernameField: 'email',
+    passwordField: 'password'
+}
+passport.use(new LocalStrategy(localStrategyOptions,function verify(email, password, callback) {
     new Promise((resolve, reject) => {
         const sql = `SELECT * FROM user WHERE email = ?`;
         return connection.query(sql, [email], (error, result) => {
@@ -73,7 +77,9 @@ passport.use(new LocalStrategy(function verify(email, password, callback) {
                 }
             });
         },
-        (errorCallback) => { return errorCallback }
+        (errorCallback) => { 
+            return errorCallback 
+        }
     );
 }));
 

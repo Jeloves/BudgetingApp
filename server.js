@@ -54,6 +54,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(express.static(path.join(__dirname, '/scripts')));
 app.use(express.static(path.join(__dirname, '/content')));
+app.use(express.static(path.join(__dirname, '/images')));
 app.use(session({
     secret: uuidv4(),
     saveUninitialized: true,
