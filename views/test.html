@@ -2,28 +2,43 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../content/reset.css">
-    <link rel="stylesheet" href="../content/login.css">
-    <title>User Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../content/reset.css">
+  <link rel="stylesheet" href="../content/login.css">
+  <title>User Login</title>
 </head>
 
 <body>
-    <form method="post" action="/login" id="login_form">
-        <i></i>
-        <input type="text" name="email" required><label class="login_credentials">Email</label></input>
-        <input type="password" name="password"required><label class="login_credentials">Password</label></input>
-        <div class="login_options">
-            <label class="login_options">
-                <input type="checkbox">
-                Keep me logged in
-            </label>
-            <a class="login_options">Forgot password?</a>
-        </div>
-        <button class="login" type="submit">Login</button>
-        <div class="login_divider"><hr class="login_divider">&nbsp;&nbsp;or&nbsp;&nbsp;<hr class="login_divider"></div>
-    </form>
+  <img></img>
+
+  <form method="post" action="/login">
+    <h1> Log In </h1>
+    <h2>First time?
+      <a style="align-self: center;" class="sign_up">Sign up today.</a>
+    </h2>
+    <input class="login_credential" id="email" type="text" name="email" placeholder="Email address" required />
+    <input class="login_credential" id="password" type="password" name="password" placeholder="Password" required />
+    <div class="login_options">
+      <label class="login_options">
+        <input class="login_options" type="checkbox">
+        Keep me logged in
+      </label>
+      <a id="forgot_password">Forgot password?</a>
+    </div>
+    <button id="login" type="submit">Login</button>
+  </form>
+
+  <div class="login_divider">
+    <hr class="login_divider">&nbsp;&nbsp;or&nbsp;&nbsp;<hr class="login_divider">
+  </div>
+
+  <section class="login_strategy">
+    <button class="login_api" id="login_apple">Continue with Apple</button>
+    <button class="login_api" id="login_google">Continue with Google</button>
+    <button class="login_api" id="sign_up">Create an Account</button>
+  </section>
+
 </body>
 
 </html>

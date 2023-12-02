@@ -1,43 +1,92 @@
 body {
-    font-size: 16px;
-}
-
-i {
-    background-image: url(../images/leaf.png);
- 
-}
-
-#login_form {
     display: flex;
     flex-direction: column;
+    align-items: center;
+}
+img {
+    background: url(../images/leaf.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 10rem;
+    width: 10rem;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    width: 100%;
+    padding: 0rem 3rem;
+    box-sizing: border-box;
+}
+
+h1 {
+    padding: 0.25rem;
+    font-size: 2rem;
+    align-self: center;
+    height: fit-content;
+    width: fit-content;
+}
+
+h2 {
+    padding: 0.25rem;
+    align-self: center;
+    height: fit-content;
+    width: fit-content;
+}
+
+input.login_credential {
+    padding: 1rem;
+	border-color: lightgray;
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 1px;
+	box-sizing: border-box;
+    height: fit-content;
+    width: inherit;
 }
 
 div.login_options {
     display: flex;
+    height: auto;
+    width: inherit;
 }
-label.login_options {
-    
-}
-a.login_options {
+a#forgot_password {
     flex-grow: 1;
     text-align: end;
 }
 
+button#login {
+    background-color: green;
+    color: white;
+    height: auto;
+    width: inherit;
+}
+
 div.login_divider {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    color: gray;
+    height: fit-content;
+    width: 100%;
 }
-hr.login_divider {
+
+hr {
     background-color: gray;
     border-width: 0px;
-    height: 0.05rem;
-    width: max-content;
+    height: 0.1rem;
     flex-grow: 1;
 }
 
-button.login {
-    background-color: blue;
-    color: white;
+section.login_strategy {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+    padding: 0rem 3rem;
+    box-sizing: border-box;
+}
+
+button.login_api {
+    margin-bottom: 0.5rem;
+    width: inherit;
+    box-sizing: border-box;
 }
