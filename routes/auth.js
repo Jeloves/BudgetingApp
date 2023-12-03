@@ -2,19 +2,24 @@ import express from 'express';
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto';
-import { connection } from '../server.js';
+import { pool } from '../server.js';
 import { v4 as uuidv4 } from 'uuid';
 import { failedUserVerification } from '../errors.js';
+import { type } from 'os';
 
 export const loginRouter = express.Router();
 
 loginRouter.use(express.urlencoded({ extended: true }));
 loginRouter.get('/', (request, result) => {
+
+    if (request.session.passport !== undefined) {
+        console.log(`User ID: ${request.session.passport.user.id}`)
+    }
     result.render('login');
 });
 
 loginRouter.post('/', passport.authenticate('local', {
-    successRedirect: '/budget',
+    successRedirect: '/login',
     failureRedirect: '/login'
 }));
 
@@ -28,7 +33,7 @@ loginRouter.post('/signup', (request, result, callback) => {
             new Promise((resolve, reject) => {
                 const userID = uuidv4();
                 const sql = `INSERT INTO user (id,email,password,salt,date) VALUES (?,?,?,?,?)`;
-                return connection.query(sql, [userID, request.body.email, hashedPassword, salt, datetime], (error) => {
+                return pool.query(sql, [userID, request.body.email, hashedPassword, salt, datetime], (error) => {
                     if (error) {
                         return reject(error);
                     } else {
@@ -57,7 +62,7 @@ const localStrategyOptions = {
 passport.use(new LocalStrategy(localStrategyOptions,function verify(email, password, callback) {
     new Promise((resolve, reject) => {
         const sql = `SELECT * FROM user WHERE email = ?`;
-        return connection.query(sql, [email], (error, result) => {
+        return pool.query(sql, [email], (error, result) => {
             if (error) {
                 return reject(callback(error));
             } else if (result.length === 1) {

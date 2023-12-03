@@ -2,6 +2,18 @@ import mysql from 'mysql2'
 import { v4 as uuidv4 } from 'uuid';
 import { NIL as NIL_UUID } from 'uuid';
 
+const connectionHost = 'localhost';
+const connectionUser = 'root';
+const connectionPassword = 'gengiW-temmy2-wahnap';
+const connectionDatabase = 'new_leaf_data';
+const myconnection = mysql.createConnection({
+    host: connectionHost,
+    user: connectionUser,
+    password: connectionPassword,
+    database: connectionDatabase,
+    namedPlaceholders: true
+});
+
 class Budget {
     #id;
     #name;
@@ -711,3 +723,29 @@ export function deleteTransaction(connection, transactionID, budgetID) {
         })
     });
 }
+
+const myLocale = 'en-US';
+const myCurr = 'USD';
+const myUserID = '7175fe96-4cb9-4d94-ac87-6e6c160d65ef';
+const myDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+const myName = 'New Budget 34'
+const myBudgetID = '94e93fed-6660-45cd-8f13-671aa63afc61'
+const catEssentialID = '3029e2a1-3e47-4ae5-bfe8-5baf12967bfb'
+const catNonessentialID = '8ada8d44-5c90-4f23-b955-fb42bf869e49'
+const creditID = 'f94fd09c-93b2-4b15-8b10-d2eca3fb656c'
+const checkingID = '01e5ae92-425e-44c9-b523-14ce68a15b13'
+const foodID = 'c6e243ce-4622-4e1e-9e68-59582617363d'
+const gasID = '816f9541-1852-4660-8f49-9fdded614955'
+const videoID = '801d00c8-adbc-4a23-8ec4-a1980bdb1353'
+const crunchyID = '6123a18a-b5e5-48f7-b597-7469c229273c'
+
+
+updateAllocationBalance(myconnection, 120.00, '60088b58-26a1-4b2e-b141-adb958575e5f', '816f9541-1852-4660-8f49-9fdded614955').then(
+    () => {
+        console.log('done')
+    },
+    (error) => {
+        console.error(error)
+    }
+)
+

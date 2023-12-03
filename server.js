@@ -10,15 +10,17 @@ import MySQLStoreCreator from 'express-mysql-session';
 import passport from 'passport'
 
 const port = 3000;
-const connectionHost = 'localhost';
-const connectionUser = 'root';
-const connectionPassword = 'gengiW-temmy2-wahnap';
-const connectionDatabase = 'new_leaf_data';
-export const connection = mysql.createConnection({
-    host: connectionHost,
-    user: connectionUser,
-    password: connectionPassword,
-    database: connectionDatabase,
+export const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: 'gengiW-temmy2-wahnap',
+    database: 'new_leaf_data',
+    waitForConnections: true,
+    connectionLimit: 10,
+    idleTimeout: 60000,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
     namedPlaceholders: true
 });
 // How frequently expired sessions will be cleared; minutes:
@@ -40,7 +42,7 @@ const storeOptions = {
     }
 }
 const MySQLStore = MySQLStoreCreator(session);
-const sessionStore = new MySQLStore(storeOptions, connection);
+const sessionStore = new MySQLStore(storeOptions, pool);
 sessionStore.onReady().then(() => {
 	console.log('MySQLStore initialized');
 }).catch(error => {
