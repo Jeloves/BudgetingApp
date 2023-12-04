@@ -5,13 +5,11 @@ import crypto from 'crypto';
 import { pool } from '../server.js';
 import { v4 as uuidv4 } from 'uuid';
 import { failedUserVerification } from '../errors.js';
-import { type } from 'os';
 
 export const loginRouter = express.Router();
 
 loginRouter.use(express.urlencoded({ extended: true }));
 loginRouter.get('/', (request, result) => {
-
     if (request.session.passport !== undefined) {
         console.log(`User ID: ${request.session.passport.user.id}`)
     }

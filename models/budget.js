@@ -1,4 +1,3 @@
-import mysql from 'mysql2'
 import { v4 as uuidv4 } from 'uuid';
 import { NIL as NIL_UUID } from 'uuid';
 
@@ -16,6 +15,24 @@ class Budget {
         this.#locale = locale;
         this.#currency = currency;
         this.#selected = selected;
+    }
+    getID() {
+        return this.#id;
+    }
+    getName() {
+        return this.#name;
+    }
+    getDate() {
+        return this.#date;
+    }
+    getLocale() {
+        return this.#locale;
+    }
+    getCurrency() {
+        return this.#currency;
+    }
+    getSelected() {
+        return this.#selected;
     }
 }
 class Account {
@@ -36,14 +53,19 @@ class Category {
     #id;
     #position;
     #name;
-    #subcategories = [];
     constructor(id, position, name) {
         this.#id = id;
         this.#position = position;
         this.#name = name;
     }
+    getID() {
+        return this.#id;
+    }
     getPosition() {
         return this.#position;
+    }
+    getName() {
+        return this.#name;
     }
 }
 class Subcategory {
@@ -55,8 +77,14 @@ class Subcategory {
         this.#position = position;
         this.#name = name;
     }
+    getID() {
+        return this.#id;
+    }
     getPosition() {
         return this.#position;
+    }
+    getName() {
+        return this.#name;
     }
 }
 class Allocation {
@@ -68,7 +96,19 @@ class Allocation {
         this.#id = id;
         this.#year = year;
         this.#month = month;
-        this.#balance = balance;
+        this.#balance = parseFloat(balance);
+    }
+    getID() {
+        return this.#id;
+    }
+    getYear() {
+        return this.#year;
+    }
+    getMonth() {
+        return this.#month;
+    }
+    getBalance() {
+        return this.#balance;
     }
 }
 class Transaction {
@@ -92,7 +132,150 @@ class Transaction {
         this.#categoryID = categoryID;
         this.#subcategoryID = subcategoryID;
     }
+    getID() {
+        return this.#id;
+    }
+    getDate() {
+        return this.#date;
+    }
+    getPayee() {
+        return this.#payee;
+    }
+    getMemo() {
+        return this.#memo;
+    }
+    getBalance() {
+        return this.#balance;
+    }
+    getApproval() {
+        return this.#approval;
+    }
+    getAccountID() {
+        return this.#accountID;
+    }
+    getCategoryID() {
+        return this.#categoryID;
+    }
+    getSubcategoryID() {
+        return this.#subcategoryID;
+    }
 }
+class User {
+    #email;
+    #date;
+    #budgets;
+    #selectedBudgetID;
+    #accounts;
+    #categories;
+    #subcategories;
+    constructor(email,date) {
+        this.#email = email;
+        this.#date = date;
+    }
+    getBudgets() {
+        return this.#budgets;
+    }
+    setBudgets(budgets) {
+        this.#budgets = budgets;
+        for (let budget of budgets) {
+            if (budget.getSelected() === 1) {
+                this.#selectedBudgetID = budget.getID();
+                break;
+            }
+        }
+    }
+    getSelectedBudgetID() {
+        return this.#selectedBudgetID;
+    }
+    setSelectedBudgetID(selectedBudgetID) {
+        this.#selectedBudgetID = selectedBudgetID;
+    }
+    getAccounts() {
+        return this.#accounts;
+    }
+    setAccounts(accounts) {
+        this.#accounts = accounts;
+    }
+    getCategories() {
+        return this.#categories;
+    }
+    setCategories(categories) {
+        this.#categories = categories;
+    }
+    getSubcategories() {
+        return this.#subcategories;
+    }
+    setSubcategories(subcategories) {
+        this.#subcategories = subcategories;
+    }
+}
+
+export function getUserData(connection, userID) {
+    console.log(`Acquiring data for userID = ${userID}`)
+    new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM user WHERE id = ?';
+        return connection.query(sql,[userID],(error, result) => {
+            if (error) { 
+                return reject(error);
+            } else {
+                return resolve(new User(result[0].email,result[0].date));
+            }
+        });
+    }).then(
+        (user) => {
+            readBudgets(connection, userID).then(
+                (budgets) => {
+                    user.setBudgets(budgets);
+                    // The line above will set user.#selectedBudgetID. This is needed for all following code where budget_id is needed.
+                    console.log('Budgets retrieved.');
+
+                    readAccounts(connection, user.getSelectedBudgetID()).then(
+                        (accounts) => {
+                            user.setAccounts(accounts);
+                            console.log('Accounts retrieved.');
+                        },
+                        (error) => {
+                            console.error(`Could not read Accounts: ${error}`);
+                        }
+                    );
+
+                    readCategories(connection, user.getSelectedBudgetID()).then(
+                        (categories) => {
+                            user.setCategories(categories);
+                            console.log('Categories retrieved.');
+                        },
+                        (error) => {
+                            console.error(`Could not read Categories: ${error}`);
+                        }
+                    );
+
+                    readSubcategories(connection, user.getSelectedBudgetID()).then(
+                        (subcategories) => {
+                            user.setSubcategories(subcategories);
+                            console.log('Subcategories retrieved.');
+                        },
+                        (error) => {
+                            console.error(`Could not read Subcategories: ${error}`);
+                        }
+                    );
+
+                    readAllocations() 
+
+                }, 
+                (error) => {
+                    console.error(`Could not read Budgets: ${error}`);
+                }
+            )
+        },
+        (error) => {
+            console.error(`Could not find userID: ${error}`);
+        }
+    );
+
+
+}
+
+// User
 
 // Budget
 export function createBudget(connection, name, date, locale, currency, userID) {
@@ -103,12 +286,12 @@ export function createBudget(connection, name, date, locale, currency, userID) {
             if (error) {
                 return reject(error);
             } else {
-                return resolve(new Budget(name, date, locale, currency, false));
+                return resolve(new Budget(name, date, locale, currency, 0));
             }
         });
     });
 }
-export function readBudgets(connection, userID) {
+function readBudgets(connection, userID) {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM budget WHERE user_id = ?';
         return connection.query(sql, [userID], (error, result) => {
@@ -339,10 +522,10 @@ export function createSubcategory(connection, position, name, budgetID, category
         });
     });
 }
-export function readSubcategories(connection, budgetID, categoryID) {
+export function readSubcategories(connection, budgetID) {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM subcategory WHERE budget_id = ? AND category_id = ?';
-        connection.query(sql, [budgetID, categoryID], (error, result) => {
+        const sql = 'SELECT * FROM subcategory WHERE budget_id = ?';
+        connection.query(sql, [budgetID], (error, result) => {
             if (error) {
                 return reject(error);
             } else {
