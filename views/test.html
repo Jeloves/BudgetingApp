@@ -5,39 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../content/reset.css">
-  <link rel="stylesheet" href="../content/login.css">
+  <link rel="stylesheet" href="../content/test.css">
   <title>User Login</title>
 </head>
 
 <body>
-  <img></img>
-  <form method="post" action="/login">
-    <h1> Log In </h1>
-    <h2>First time?
-      <a style="align-self: center;" class="sign_up">Sign up today.</a>
-    </h2>
-    <input class="login_credential" id="email" type="text" name="email" placeholder="Email address" required />
-    <input class="login_credential" id="password" type="password" name="password" placeholder="Password" required />
-    <div class="login_options">
-      <label class="login_options">
-        <input class="login_options" type="checkbox">
-        Keep me logged in
-      </label>
-      <a id="forgot_password">Forgot password?</a>
-    </div>
-    <button id="login" type="submit">Login</button>
-  </form>
-
-  <div class="login_divider">
-    <hr class="login_divider">&nbsp;&nbsp;or&nbsp;&nbsp;<hr class="login_divider">
+  <div class="container">
+    <p class="draggable" draggable="true"> Essential </p>
+    <p class="draggable" draggable="true"> Food </p>
+    <p class="draggable" draggable="true"> Gas </p>
+    <p class="draggable" draggable="true"> Nonessential </p>
+    <p class="draggable" draggable="true"> Crunchyroll </p>
+    <p class="draggable" draggable="true"> Videogames </p>
   </div>
 
-  <section class="login_strategy">
-    <button class="login_api" id="login_apple">Continue with Apple</button>
-    <button class="login_api" id="login_google">Continue with Google</button>
-    <button class="login_api" id="sign_up">Create an Account</button>
-  </section>
-
+  <script src="../scripts/test.js"></script>
 </body>
 
 </html>

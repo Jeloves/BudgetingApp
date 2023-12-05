@@ -56,7 +56,7 @@
           <data class="allocation_header">AVAILABLE</data>
         </div>
         <% let categories=budget.getCategories() %>
-        <% for (let ci in categories) {%>
+        <% for (let ci in categories) { %>
         <div class="outer_category_wrapper" id="outer_category_wrapper_<%=ci%>">
           <div class="inner_category_wrapper" id="inner_category_wrapper_<%=ci%>">
             <data class="category_name" id="category_name_ci<%=ci%>"><%=categories[ci].getName()%></data>
@@ -74,7 +74,7 @@
           </div>
           <% }%>
         </div>
-        <% }%>
+        <% } %>
       </section>
       <section class="transactions">
 
