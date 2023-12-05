@@ -9,10 +9,11 @@ body {
 }
 
 .draggable {
-    padding: 1 rem;
+    padding: 2rem 1rem;
     background-color: white;
     border: 1px solid black;
     cursor: move;
+    transition: top 0.3s ease-out;
 }
 
 .dragging {

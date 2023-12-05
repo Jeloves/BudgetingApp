@@ -26,7 +26,7 @@ export const pool = mysql.createPool({
 // How frequently expired sessions will be cleared; minutes:
 const checkExpirationInterval = 6 * 60;
 // The maximum age of a valid session; minutes:
-const expiration = 5;   
+const expiration = 5;
 const storeOptions = {
     clearExpired: true,
 	checkExpirationInterval: checkExpirationInterval * 60000,

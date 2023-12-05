@@ -17,7 +17,7 @@ loginRouter.get('/', (request, result) => {
 });
 
 loginRouter.post('/', passport.authenticate('local', {
-    successRedirect: '/login',
+    successRedirect: '../budget',
     failureRedirect: '/login'
 }));
 

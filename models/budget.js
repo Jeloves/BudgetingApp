@@ -92,11 +92,13 @@ class Allocation {
     #year;
     #month;
     #balance;
-    constructor(id, year, month, balance) {
+    #subcategoryID;
+    constructor(id, year, month, balance, subcategoryID) {
         this.#id = id;
         this.#year = year;
         this.#month = month;
         this.#balance = parseFloat(balance);
+        this.#subcategoryID = subcategoryID;
     }
     getID() {
         return this.#id;
@@ -109,6 +111,9 @@ class Allocation {
     }
     getBalance() {
         return this.#balance;
+    }
+    getSubcategoryID() {
+        return this.#subcategoryID;
     }
 }
 class Transaction {
@@ -163,13 +168,28 @@ class Transaction {
 class User {
     #email;
     #date;
-    #budgets;
     #selectedBudgetID;
+    #budgets;
     #accounts;
     #categories;
     #subcategories;
-    constructor(email,date) {
+    #allocations;
+    #transactions;
+    constructor(email, date, selectedBudgetID) {
         this.#email = email;
+        this.#date = date;
+        this.#selectedBudgetID = selectedBudgetID;
+    }
+    getEmail() {
+        return this.#email;
+    }
+    setEmail(email) {
+        this.#email = email;
+    }
+    getDate() {
+        return this.#date;
+    }
+    setDate(date) {
         this.#date = date;
     }
     getBudgets() {
@@ -208,74 +228,74 @@ class User {
     setSubcategories(subcategories) {
         this.#subcategories = subcategories;
     }
+    getAllocations() {
+        return this.#allocations;
+    }
+    setAllocations(allocations) {
+        this.#allocations = allocations;
+    }
+    getTransactions() {
+        return this.#transactions;
+    }
+    setTransactions(transactions) {
+        this.#transactions = transactions;
+    }
 }
 
 export function getUserData(connection, userID) {
-    console.log(`Acquiring data for userID = ${userID}`)
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM user WHERE id = ?';
-        return connection.query(sql,[userID],(error, result) => {
-            if (error) { 
+        return connection.query(sql, [userID], (error, result) => {
+            if (error) {
                 return reject(error);
             } else {
-                return resolve(new User(result[0].email,result[0].date));
+                return resolve({ email: result[0].email, date: result[0].date });
             }
         });
     }).then(
-        (user) => {
-            readBudgets(connection, userID).then(
-                (budgets) => {
-                    user.setBudgets(budgets);
-                    // The line above will set user.#selectedBudgetID. This is needed for all following code where budget_id is needed.
-                    console.log('Budgets retrieved.');
-
-                    readAccounts(connection, user.getSelectedBudgetID()).then(
-                        (accounts) => {
-                            user.setAccounts(accounts);
-                            console.log('Accounts retrieved.');
-                        },
-                        (error) => {
-                            console.error(`Could not read Accounts: ${error}`);
-                        }
-                    );
-
-                    readCategories(connection, user.getSelectedBudgetID()).then(
-                        (categories) => {
-                            user.setCategories(categories);
-                            console.log('Categories retrieved.');
-                        },
-                        (error) => {
-                            console.error(`Could not read Categories: ${error}`);
-                        }
-                    );
-
-                    readSubcategories(connection, user.getSelectedBudgetID()).then(
-                        (subcategories) => {
-                            user.setSubcategories(subcategories);
-                            console.log('Subcategories retrieved.');
-                        },
-                        (error) => {
-                            console.error(`Could not read Subcategories: ${error}`);
-                        }
-                    );
-
-                    readAllocations() 
-
-                }, 
-                (error) => {
-                    console.error(`Could not read Budgets: ${error}`);
-                }
-            )
+        (userInfo) => {
+            return new Promise((resolve, reject) => {
+                const sql = 'SELECT * FROM budget WHERE user_id = ? AND selected = 1';
+                return connection.query(sql, [userID], (error, result) => {
+                    if (error) {
+                        return reject(error);
+                    } else {
+                        const user = new User(userInfo.email, userInfo.date, result[0].id);
+                        return resolve(readUserData(connection, userID, user));
+                    }
+                });
+            });
         },
         (error) => {
-            console.error(`Could not find userID: ${error}`);
+            return Promise.reject(error);
         }
     );
-
-
 }
-
-// User
+export function readUserData(connection, userID, user) {
+    return new Promise((resolve, reject) => {
+        const budgetPromise = readBudgets(connection, userID)
+        const accountPromise = readAccounts(connection, user.getSelectedBudgetID());
+        const categoryPromise = readCategories(connection, user.getSelectedBudgetID());
+        const subcategoryPromise = readSubcategories(connection, user.getSelectedBudgetID());
+        const allocationPromise = readAllocations(connection, user.getSelectedBudgetID());
+        const transactionPromise = readTransactions(connection, user.getSelectedBudgetID());
+    
+        Promise.all([budgetPromise, accountPromise, categoryPromise, subcategoryPromise, allocationPromise, transactionPromise]).then(
+            (data) => {
+                user.setBudgets(data[0]);
+                user.setAccounts(data[1]);
+                user.setCategories(data[2]);
+                user.setSubcategories(data[3]);
+                user.setAllocations(data[4]);
+                user.setTransactions(data[5]);
+                return resolve(user);
+            },
+            (error) => {
+                return reject(`An error has occured when reading budget data: ${error}`)
+            }
+        );
+    });
+}
 
 // Budget
 export function createBudget(connection, name, date, locale, currency, userID) {
@@ -635,16 +655,16 @@ export function createAllocation(connection, year, month, balance, subcategoryID
         })
     });
 }
-export function readAllocations(connection, subcategoryID) {
+export function readAllocations(connection, budgetID) {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM allocation WHERE subcategory_id = ?';
-        connection.query(sql, [subcategoryID], (error, result) => {
+        const sql = 'SELECT * FROM allocation WHERE budget_id = ?';
+        connection.query(sql, [budgetID], (error, result) => {
             if (error) {
                 return reject(error);
             } else {
                 const allocations = [];
                 for (let row of result) {
-                    allocations.push(new Allocation(row.id, row.year, row.month, parseFloat(row.balance)));
+                    allocations.push(new Allocation(row.id, row.year, row.month, parseFloat(row.balance), row.subcategory_id));
                 }
                 return resolve(allocations)
             }

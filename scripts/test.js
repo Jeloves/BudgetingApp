@@ -1,5 +1,12 @@
+import { doSomething } from "../controllers/budget.js";
+
 const draggables = document.querySelectorAll('.draggable');
 const container = document.querySelector('.container');
+var originalOrder = [];
+for (let draggable of [...container.querySelectorAll('.draggable')]) {
+    originalOrder.push(draggable.id);
+}
+
 
 draggables.forEach(draggable => {
     draggable.addEventListener('dragstart', () => {
@@ -7,6 +14,11 @@ draggables.forEach(draggable => {
     });
     draggable.addEventListener('dragend', () => {
         draggable.classList.remove('dragging');
+        if (checkDraggablePositions(container)) {
+            
+
+            doDatabaseStuff();
+        }
     });
 });
 
@@ -16,6 +28,7 @@ container.addEventListener('dragover', e => {
     const draggable = document.querySelector('.dragging');
     if (afterElement === null) {
         container.appendChild(draggable);
+        console.log(`draggable = null: ${draggable}`)
     } else {
         container.insertBefore(draggable, afterElement);
     }
@@ -27,9 +40,30 @@ function getDragAfterElement(container, y) {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         if (offset < 0 && offset > closest.offset) {
-            return {offset: offset, element: child}
+            return { offset: offset, element: child }
         } else {
             return closest;
         }
     }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function checkDraggablePositions(container) {
+    var somethingHasChanged = false;
+    const draggables = [...container.querySelectorAll('.draggable')]
+    const newOrder = [];
+    for (let draggable of draggables) {
+        newOrder.push(draggable.id);
+    }
+    for (let i = 0; i < draggables.length; i++) {
+        if (originalOrder[i] !== newOrder[i]) {
+            somethingHasChanged = true;
+            break;
+        }
+    }
+    originalOrder = [...newOrder];
+    return somethingHasChanged;
+}
+
+function doDatabaseStuff() {
+    console.log('Database stuff complete')
 }
