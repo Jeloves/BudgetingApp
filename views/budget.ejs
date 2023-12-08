@@ -10,11 +10,32 @@
 </head>
 
 <body>
-<p>
-<%=  user.getEmail() %>
-</p>
-   
 
+
+
+  <header>
+    Hello
+  </header>
+
+  <%console.log(JSON.stringify(user))%>
+  <data class="userdata"></data>
+  <section class="categories">
+    <div class="category_container">
+      <% for (let category of user.getCategories()) { %>
+      <%if (category.getName() !== 'Unassigned Category') {%>
+      <div class="category" draggable="true" id="<%=category.getID()%>">
+        <data class="categoryName"><%=category.getName()%></data>
+        <div class="subcategory_container">
+          <%for (let subcategory of user.getSubcategories()) { %>
+          <%if (subcategory.getCategoryID() === category.getID()) {%>
+          <p class="subcategory" draggable="true" id="<%=subcategory.getID()%>"><%=subcategory.getName()%></p>
+          <%}}%>
+        </div>
+      </div>
+      <%}}%>
+    </div>
+  </section>
+  <script type="module" src="/category_recycler.js"></script>
 </body>
 
 </html>

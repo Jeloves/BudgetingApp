@@ -10,15 +10,43 @@
 </head>
 
 <body>
+  <header>
+    Unassigned goes here
+  </header>
+
+  <data class="userdata"><%=JSON.stringify(user.getCategories())%></data>
+
+  <button class="collapsible"> Collapse </button>
   <div class="container">
-    <p class="draggable" draggable="true" id="category_essentialID"> Essential </p>
-    <p class="draggable" draggable="true" id ="subcategory_foodID"> Food </p>
-    <p class="draggable" draggable="true" id ="subcategory_gasID"> Gas </p>
-    <p class="draggable" draggable="true" id ="category_nonessentialID"> Nonessential </p>
-    <p class="draggable" draggable="true" id ="subcategory_crunchyrollID"> Crunchyroll </p>
-    <p class="draggable" draggable="true" id ="subcategory_videogamesID"> Videogames </p>
+    <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e496123a18a-b5e5-48f7-b597-7469c229273c" draggable="true">Crunchyroll</data>
+    <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e49801d00c8-adbc-4a23-8ec4-a1980bdb1353" draggable="true">Video Games</data>
+  
+    <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e49801d00c8-adbc-4a23-8ec4-a1980bdb1353" draggable="true">Video Games</data>
   </div>
-  <script type="module" src="../scripts/test.js"></script>
+  <button class="collapsible"> Collapse </button>
+  <div class="container">
+    <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e496123a18a-b5e5-48f7-b597-7469c229273c" draggable="true">Crunchyroll</data>
+    <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e49801d00c8-adbc-4a23-8ec4-a1980bdb1353" draggable="true">Video Games</data>
+  </div>
+  
+
+  <!--
+  <section class="category_container">
+    <data class="category" id="3029e2a1-3e47-4ae5-bfe8-5baf12967bfb" draggable="true">Essential</data>
+    <div class="subcategory_container" id="subcon3029e2a1-3e47-4ae5-bfe8-5baf12967bfb">
+      <data class="subcategory" id="3029e2a1-3e47-4ae5-bfe8-5baf12967bfbc6e243ce-4622-4e1e-9e68-59582617363d" draggable="true">Food</data>
+      <data class="subcategory" id="3029e2a1-3e47-4ae5-bfe8-5baf12967bfb816f9541-1852-4660-8f49-9fdded614955" draggable="true">Gas</data>
+    </div>
+    <data class="category" id="8ada8d44-5c90-4f23-b955-fb42bf869e49" draggable="true">Nonssential</data>
+    <div class="subcategory_container" id="subcon8ada8d44-5c90-4f23-b955-fb42bf869e49">
+      <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e496123a18a-b5e5-48f7-b597-7469c229273c" draggable="true">Crunchyroll</data>
+      <data class="subcategory" id="8ada8d44-5c90-4f23-b955-fb42bf869e49801d00c8-adbc-4a23-8ec4-a1980bdb1353" draggable="true">Video Games</data>
+    </div>
+  </section>
+  -->
+
+
+  <script type="module" src="../scripts/category_recycler.js"></script>
 </body>
 
 </html>

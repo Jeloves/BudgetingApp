@@ -1,7 +1,9 @@
-import { doSomething } from "../controllers/budget.js";
 
-const draggables = document.querySelectorAll('.draggable');
-const container = document.querySelector('.container');
+
+const subcategories = document.querySelectorAll('.subcategory');
+const subcategoryContainers = document.querySelectorAll('.subcategory_container');
+
+
 var originalOrder = [];
 for (let draggable of [...container.querySelectorAll('.draggable')]) {
     originalOrder.push(draggable.id);

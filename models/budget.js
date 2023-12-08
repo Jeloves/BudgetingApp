@@ -8,6 +8,7 @@ class Budget {
     #locale;
     #currency;
     #selected;
+    #unassignedBalance;
     constructor(id, name, date, locale, currency, selected) {
         this.#id = id;
         this.#name = name;
@@ -33,6 +34,12 @@ class Budget {
     }
     getSelected() {
         return this.#selected;
+    }
+    getUnassignedBalance() {
+        return this.#unassignedBalance;
+    }
+    setUnassignedBalance(balance) {
+        this.#unassignedBalance = balance;
     }
 }
 class Account {
@@ -72,10 +79,12 @@ class Subcategory {
     #id;
     #position;
     #name;
-    constructor(id, position, name) {
+    #categoryID;
+    constructor(id, position, name, categoryID) {
         this.#id = id;
         this.#position = position;
         this.#name = name;
+        this.#categoryID = categoryID;
     }
     getID() {
         return this.#id;
@@ -85,6 +94,9 @@ class Subcategory {
     }
     getName() {
         return this.#name;
+    }
+    getCategoryID() {
+        return this.#categoryID;
     }
 }
 class Allocation {
@@ -279,7 +291,7 @@ export function readUserData(connection, userID, user) {
         const subcategoryPromise = readSubcategories(connection, user.getSelectedBudgetID());
         const allocationPromise = readAllocations(connection, user.getSelectedBudgetID());
         const transactionPromise = readTransactions(connection, user.getSelectedBudgetID());
-    
+
         Promise.all([budgetPromise, accountPromise, categoryPromise, subcategoryPromise, allocationPromise, transactionPromise]).then(
             (data) => {
                 user.setBudgets(data[0]);
@@ -551,7 +563,7 @@ export function readSubcategories(connection, budgetID) {
             } else {
                 const subcategories = [];
                 for (let row of result) {
-                    subcategories.push(new Subcategory(row.id, row.position, row.name));
+                    subcategories.push(new Subcategory(row.id, row.position, row.name, row.category_id));
                 }
                 subcategories.sort((a, b) => a.getPosition() - b.getPosition());
                 return resolve(subcategories);
